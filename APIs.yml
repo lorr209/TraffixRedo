@@ -1,0 +1,134 @@
+openapi: '3.0.3'
+info:
+  version: '1.0'
+  title: "Traffix OpenAPI"
+  description: API for accessing to the Traffix ecosystem
+  license: 
+    name: MIT
+servers:
+  - url: https://api.server.test/v1
+    description: Localhost
+  - url: !!!METTI_QUI_L'URL_DI_ON_RENDER
+    description: render.com
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: OK
+
+
+  /authentications:
+    post:
+      summary: Authenticate a user
+      description: >-
+        Authenticates a user and returns a JWT 'token'.
+      responses:
+        '200':
+          description: 'Token created'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'True if the authentication was successful'
+                  token:
+                    type: string
+                    description: 'JWT token'
+        '401':
+          description: 'Unauthorized. Invalid credentials'
+      requestBody:
+        description: >-
+          The email and password must be passed in the body.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: 'Email address of the user'
+                password:
+                  type: string
+                  description: 'Password of the user'
+            examples:
+              example1:
+                value:
+                  email: 'mario.rossi@unitn.it'
+                  password: 'password'
+    
+  /register:
+    post:
+      summary: Create a new user
+      description: >-
+        Add a new user to the database.
+        Admin only.
+      responses:
+        '200':
+          description: 'User added'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'True if the authentication was successful'
+        '401':
+          description: 'Unauthorized'
+        '409':
+          description: 'User already stored'
+      requestBody:
+        description: >-
+          The email and password must be passed in the body.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: 'Email address of the user'
+                password:
+                  type: string
+                  description: 'Password of the user'
+            examples:
+              example1:
+                value:
+                  email: 'mario.rossi@unitn.it'
+                  password: 'password'
+    
+  /log: 
+    get:
+      summary: Return the logs
+      description: >-
+        Shows all the logs in the system.
+        Admin only.
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [user, admin]
+      responses:
+        '200': 
+          description: 'Logs list'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: 'True if the authentication was successful'
+
