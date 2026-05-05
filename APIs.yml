@@ -11,14 +11,9 @@ servers:
   - url: !!!METTI_QUI_L'URL_DI_ON_RENDER
     description: render.com
 paths:
-  /test:
-    get:
-      responses:
-        '200':
-          description: OK
 
-
-  /authentications:
+  # * API per l'autenticazione
+  /auth:
     post:
       summary: Authenticate a user
       description: >-
@@ -63,52 +58,9 @@ paths:
                   email: 'mario.rossi@unitn.it'
                   password: 'password'
     
-  /register:
-    post:
-      summary: Create a new user
-      description: >-
-        Add a new user to the database.
-        Admin only.
-      responses:
-        '200':
-          description: 'User added'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    description: 'True if the authentication was successful'
-        '401':
-          description: 'Unauthorized'
-        '409':
-          description: 'User already stored'
-      requestBody:
-        description: >-
-          The email and password must be passed in the body.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  description: 'Email address of the user'
-                password:
-                  type: string
-                  description: 'Password of the user'
-            examples:
-              example1:
-                value:
-                  email: 'mario.rossi@unitn.it'
-                  password: 'password'
-    
-  /log: 
+  # * API che restituisce tutti i log nel sistema 
+  #TODO Aggiungere eventuali filtri ?id=
+  /logs: 
     get:
       summary: Return the logs
       description: >-
@@ -116,19 +68,509 @@ paths:
         Admin only.
       parameters:
         - in: query
-          name: role
+          name: user
           schema:
             type: string
-            enum: [user, admin]
       responses:
         '200': 
           description: 'Logs list'
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    description: 'True if the authentication was successful'
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogEntry' #!! CORREGGERE
 
+  # * API per ottenere una lista degli utenti (GET) o per crearne uno nuovo (POST)
+  /users:
+    get:
+      summary: returns the users
+      description: >-
+        Retrieve all users from the database.
+      parameters:                             # * Query opzionale ?role= per filtrare
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [user, admin]
+      responses:
+        "200":
+          description: "Collections of users"
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: 
+                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+
+    post: 
+      summary: create a new user 
+      description: >-
+        Create a new user in the system
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+            examples:
+              example1:
+                value:
+                  email: "mario.rossi@unitn.it" #!!!! SOSTITUIRE CON UN ESEMPIO APPROPRIATO
+      responses:
+        "201":
+          description: "User created" #* nelle doc di open api specifica che c'è il link nel location header ????
+          headers:
+            "Location":
+              schema:
+                type: string
+              description: Link to the newly created user
+
+  # * API per ottenere i dettagli di un utente specifico (GET)
+  # * o per modificarne alcuni campi (PATCH)
+  /users/{userID}: 
+    get: 
+      description: >-
+        retrieve the user given a certain ID
+      summary: get an user
+      parameters:
+        - in: path
+          name: userID
+          required: true
+          schema:
+            type: string
+          description: id of the user
+      responses:
+        "200": 
+          description: "user found"
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/user" #! il riferimento è riferito rispetto alla parte sottostante di codice
+        "404":
+          description: "user not found"
+
+    patch: 
+      summary: Partially update a user
+      description: Update specific fields without affecting the rest of the document.
+      tags:
+        - Users #! Aggiungere tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        description: User fields to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate'
+        '404':
+          description: User not found
+
+  # * API per modificare la password di un utente (PATCH) 
+  # ? o PUT?
+  /users/{userID}/password:
+    put: 
+      description: >-
+        change an user password with a provided one
+      summary: change an user password
+      parameters: 
+        - in: path
+          name: userID
+          required: true
+          schema:
+            type: string
+          description: id of the user
+      requestBody:
+        description: >-
+          The old password, required for security purpouses, and the new password must be passed in the body.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                  description: Old password of the user
+                newPassword:
+                  type: string
+                  description: New password of the user
+            examples:
+              example1:
+                value:
+                  email: '1234' 
+                  password: '4321'
+      responses:
+        '200':
+          description: Password updated successfully
+        '400':
+          description: Invalid input or password requirements not met
+        '401':
+          description: Old password incorrect
+        '404':
+          description: User not found
+
+  # * API per ottenere i moduli accessibili dall'utente, legati al ruolo (GET)
+  /users/{id}/moduli:                      #? rimandiamo all'user quale moduli richiedere ma poi facciamo comunque controlli?? e come li mandiamo 
+    get:
+      summary: Retrieve available modules
+      description: >-
+        Retriveve and display to the user the available modules
+      responses:
+        "200":
+          description: A JSON array of available modules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string       #* IDs
+
+  # * API per ottenere una lista delle lamentale (GET)
+  # ? Non serve un post, non vengono messe dalla dashboard, un delete invece?
+  # ? tanto per mostrare che sappiamo fare i delete
+  /complaints: 
+    get:
+      summary: returns the complaints
+      description: >-
+        Retrieve all complaints from the database.
+      parameters:                             # ? Query opzionale ?tipo= per filtrare
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [TPL, traffico]
+      responses:
+        "200":
+          description: "Collections of complaints"
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: 
+                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+
+  # * Cerca tutti i moduli nel sistema (GET)
+  # ? Dovremmo ben definire un modulo, per questo caso credo ci serva solo
+  # ? saperne nome ed ID giusto per mostrarli (Sia per la pagina dedicata che il main)
+  /modules: 
+    get:
+      summary: returns the modules
+      description: >-
+        Retrieve all modules available in the system.
+      parameters:                             # * Query opzionale per filtrare i moduli attivi
+        - in: query
+          name: active
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: "Collections of modules"
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: 
+                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+  
+  # * Attiva o disattiva un modulo (PATCH)
+  /modules/{id}: 
+    patch: 
+      description: >-
+        Activate/Deactivate a module
+      summary: Activate/Deactivate a module
+      parameters:
+        - in: path
+          name: userID
+          required: true
+          schema:
+            type: string
+          description: id of the user
+      responses:
+        "200": 
+          description: "module found"
+          content: 
+            application/json: 
+              schema: 
+                $ref: "#/components/schemas/module" #! il riferimento è riferito rispetto alla parte sottostante di codice
+        "404":
+          description: "module not found"
+
+  # * Elenca i ruoli disponibili (GET) o ne crea uno nuovo (POST)
+  /roles:
+    
+  # * Modifica le informazioni relative ad un ruolo (PATCH)
+  /roles/{id}: 
+
+    patch: 
+      summary: Update a role
+      description: Update specific fields without affecting the rest of the document.
+      tags:
+        - Role #! Aggiungere tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: role ID
+          schema:
+            type: string
+      requestBody:
+        description: Role fields to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate' #! da creare
+      responses:
+        '200':
+          description: Role updated successfully
+          content:                  #? Che serva effettivamente, sia qui che altrove?
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleUpdate'
+        '404':
+          description: User not found
+
+  # * Ottiene una lista dei premi (GET) o ne crea uno nuovo (POST)
+  /prizes: 
+    get:
+      summary: returns the prizes
+      description: >-
+        Retrieve all prizes from the database.
+      parameters:                             # ? Vogliamo filtrare qualcosa ?
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [user, admin]
+      responses:
+        "200":
+          description: "Collections of prizes"
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: 
+                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+
+    post: 
+      summary: create a new user 
+      description: >-
+        Create a new user in the system
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+            examples:
+              example1:
+                value:
+                  email: "mario.rossi@unitn.it" #!!!! SOSTITUIRE CON UN ESEMPIO APPROPRIATO
+      responses:
+        "201":
+          description: "User created" #* nelle doc di open api specifica che c'è il link nel location header ????
+          headers:
+            "Location":
+              schema:
+                type: string
+              description: Link to the newly created user
+
+  # * Modifica informazioni relative ad un premio (PATCH)
+  /prizes/{id}: 
+    patch: 
+      summary: Partially update a Prize
+      description: Update specific fields without affecting the rest of the document.
+      tags:
+        - Prizes #! Aggiungere tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Prize ID
+          schema:
+            type: string
+      requestBody:
+        description: Prize fields to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrizeUpdate' # ? Che serva averne uno diverso?
+      responses:
+        '200':
+          description: Prize updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrizeUpdate'
+        '404':
+          description: Prize not found
+
+  # ! Definire bene la parte del traffico
+  /traffico:
+
+  
+# !! a che servono i link nelle apI? boh
+
+# !! parte di components e di schemas
+components:
+
+  securitySchemes:
+    
+    #*-----------------------------------------------------------------
+    #* Che è sta roba??
+    # * Ok forse serve per i login (update di qualche ora dopo)
+     XAccessTokenHeaderAuth: # arbitrary name for the security scheme
+      description: >-
+        The API authentication.
+        The API key must be passed in the header 'x-access-token'.
+        The API key must be a valid JWT token.
+      type: apiKey
+      in: header
+      name: x-access-token
+    
+    TokenQueryAuth: # arbitrary name for the security scheme
+      description: >-
+        The API authentication.
+        The API key must be passed in the query string 'token'.
+        The API key must be a valid JWT token.
+      type: apiKey
+      in: query
+      name: token
+
+    #*-------------------------------------------------------
+
+  schemas: 
+    #*-----------------------------------------------------------------------
+    #*Schemi dei database
+    #* Lasciati esempi da easy lib
+
+    User:
+      type: object
+      required:
+        - _id
+        - Attivo
+        - Cognome
+        - Data_Creazione
+        - Email
+        - Nome
+        - Punti
+      properties:
+        _id:
+          type: string
+        Nome:
+          type: string
+          example: "Mario"
+        Cognome:
+          type: string
+          example: "Rossi"
+        Email:
+          type: string
+          example: "mario.rossi@example.com"
+        Attivo:
+          type: boolean
+          description: "Whether the user account is active"
+        Data_Creazione:
+          type: string
+          format: date-time
+          description: "timestamp of account creation"
+        Punti:
+          type: integer
+          minimum: 0
+          description: "Current point balance"
+
+    UserUpdate:
+      type: object
+      description: "Fields that can be modified, all of which are optional"
+      properties:
+        Attivo:
+          type: boolean
+          description: "Activate/Deactivate a user"
+        Role:
+          type: string
+          enum: [user, admin] #!Abbiamo più tipi in realtà
+          description: "Change the user's permission level"
+
+    Book:
+      type: object
+      required:
+        - title
+        - author
+        - ISBN
+        - status
+      properties:
+        self:
+          type: string
+          description: 'Link to the book'
+        title:
+          type: string
+          description: 'Title of the book'
+        author:
+          type: string
+          description: 'Author of the book'
+        ISBN:
+          type: string
+          description: 'ISBN of the book'
+        status:
+          type: string
+          enum: [available, lended]
+          description: 'Tells whether the book is currently available or not'
+    
+    Booklending:
+      type: object
+      required:
+      - student
+      - book
+      properties:
+        self:
+          type: string
+          description: 'Link to the booklending'
+        student:
+          type: string
+          description: 'Link to the student'
+        book:
+          type: string
+          description: 'Link to the book'
+        start_date:
+          type: string
+          format: date-time
+          description: 'Start date of the booklending'
+          default: '${currentDate}'
+        end_date:
+          type: string
+          format: date-time
+          description: 'End date of the booklending'
+        status:
+          type: string
+          enum: [active, expired]
+          description: 'Tells whether the booklending is currently active or not'
+        overdue:  
+          type: boolean
+          description: >-
+            Tells whether the booklending is currently overdue or not.
+            The booklending is overdue if the end date is in the past and the status is 'active'.
+            The booklending is not overdue if the end date is in the future and the status is 'active'.
+            The booklending is not overdue if the status is 'expired'.
+        overdue_days:
+          type: integer
+          description: >-
+            Number of days the booklending is overdue.
+            The booklending is overdue if the end date is in the past and the status is 'active'.
+            The booklending is not overdue if the end date is in the future and the status is 'active'.
+            The booklending is not overdue if the status is 'expired'.
+            The number of days is calculated as the difference between the current date and the end date.
