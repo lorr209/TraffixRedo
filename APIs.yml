@@ -59,7 +59,7 @@ paths:
                   password: 'password'
     
   # * API che restituisce tutti i log nel sistema 
-  #TODO Aggiungere eventuali filtri ?id=
+  #TODO Aggiungere eventuali filtri ?UserID=
   /logs: 
     get:
       summary: Return the logs
@@ -92,7 +92,6 @@ paths:
           name: role
           schema:
             type: string
-            enum: [user, admin]
       responses:
         "200":
           description: "Collections of users"
@@ -181,7 +180,7 @@ paths:
   # * API per modificare la password di un utente (PATCH) 
   # ? o PUT?
   /users/{userID}/password:
-    put: 
+    patch: 
       description: >-
         change an user password with a provided one
       summary: change an user password
@@ -242,8 +241,6 @@ paths:
                   type: string       #* IDs
 
   # * API per ottenere una lista delle lamentale (GET)
-  # ? Non serve un post, non vengono messe dalla dashboard, un delete invece?
-  # ? tanto per mostrare che sappiamo fare i delete
   /complaints: 
     get:
       summary: returns the complaints
@@ -254,7 +251,7 @@ paths:
           name: type
           schema:
             type: string
-            enum: [TPL, traffico]
+            enum: [TPL, traffico]             # ! Vedere i tag che usiamo
       responses:
         "200":
           description: "Collections of complaints"
@@ -266,8 +263,6 @@ paths:
                 $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
 
   # * Cerca tutti i moduli nel sistema (GET)
-  # ? Dovremmo ben definire un modulo, per questo caso credo ci serva solo
-  # ? saperne nome ed ID giusto per mostrarli (Sia per la pagina dedicata che il main)
   /modules: 
     get:
       summary: returns the modules
@@ -312,8 +307,49 @@ paths:
           description: "module not found"
 
   # * Elenca i ruoli disponibili (GET) o ne crea uno nuovo (POST)
+  # TODO: da fare
   /roles:
-    
+    get:
+      summary: returns the users
+      description: >-
+        Retrieve all users from the database.
+      parameters:                             # * Query opzionale ?role= per filtrare
+        - in: query
+          name: role
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Collections of users"
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: 
+                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+
+    post: 
+      summary: create a new user 
+      description: >-
+        Create a new user in the system
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+            examples:
+              example1:
+                value:
+                  email: "mario.rossi@unitn.it" #!!!! SOSTITUIRE CON UN ESEMPIO APPROPRIATO
+      responses:
+        "201":
+          description: "User created" #* nelle doc di open api specifica che c'è il link nel location header ????
+          headers:
+            "Location":
+              schema:
+                type: string
+              description: Link to the newly created user
+            
   # * Modifica le informazioni relative ad un ruolo (PATCH)
   /roles/{id}: 
 
@@ -421,9 +457,51 @@ paths:
         '404':
           description: Prize not found
 
-  # ! Definire bene la parte del traffico
-  /traffico:
+  # * Ottiene i dati relativi alla densità dei veicoli (GET)
+  /traffic/density:
+    get:
+      summary: Retrieve individual car data
+      tags:
+        - Traffic
+      parameters:    # ! implementare come limite basso e limite alto
+        - name: timestamp
+          in: query
+          description: "Filter by hour (0-23)"
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 23
+      responses:
+        '200':
+          description: A list of car observations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CarObservation'
 
+  # * Ottiene i dati relativi alla densità dei veicoli (GET)
+  /traffic/cars:
+    get:
+      summary: Retrieve car density statistics
+      tags:
+        - Traffic
+      parameters:   # ! implementare come limite basso e limite alto
+        - name: hour
+          in: query
+          description: "Filter by hour (0-23)"
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Density data for the requested period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarDensity' 
   
 # !! a che servono i link nelle apI? boh
 
@@ -506,6 +584,7 @@ components:
           enum: [user, admin] #!Abbiamo più tipi in realtà
           description: "Change the user's permission level"
 
+    UserCreate: #! Da definire
     Book:
       type: object
       required:
