@@ -13,6 +13,7 @@ servers:
 paths:
 
   # * API per l'autenticazione
+  # ! De Nato
   /auth:
     post:
       summary: Authenticate a user
@@ -60,6 +61,7 @@ paths:
     
   # * API che restituisce tutti i log nel sistema 
   #TODO Aggiungere eventuali filtri ?UserID=
+  # ! Senesi
   /logs: 
     get:
       summary: Return the logs
@@ -82,6 +84,7 @@ paths:
                   $ref: '#/components/schemas/LogEntry' #!! CORREGGERE
 
   # * API per ottenere una lista degli utenti (GET) o per crearne uno nuovo (POST)
+  # ! De Nato
   /users:
     get:
       summary: returns the users
@@ -126,6 +129,7 @@ paths:
 
   # * API per ottenere i dettagli di un utente specifico (GET)
   # * o per modificarne alcuni campi (PATCH)
+  # ! De Nato
   /users/{userID}: 
     get: 
       description: >-
@@ -178,6 +182,7 @@ paths:
           description: User not found
 
   # * API per modificare la password di un utente (PATCH) 
+  # ! De Nato
   # ? o PUT?
   /users/{userID}/password:
     patch: 
@@ -225,6 +230,7 @@ paths:
           description: User not found
 
   # * API per ottenere i moduli accessibili dall'utente, legati al ruolo (GET)
+  # ! De Nato
   /users/{id}/moduli:                      #? rimandiamo all'user quale moduli richiedere ma poi facciamo comunque controlli?? e come li mandiamo 
     get:
       summary: Retrieve available modules
@@ -241,6 +247,7 @@ paths:
                   type: string       #* IDs
 
   # * API per ottenere una lista delle lamentale (GET)
+  # ! Senesi
   /complaints: 
     get:
       summary: returns the complaints
@@ -262,7 +269,9 @@ paths:
                 items: 
                 $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
 
+
   # * Cerca tutti i moduli nel sistema (GET)
+  # ! Senesi
   /modules: 
     get:
       summary: returns the modules
@@ -284,6 +293,7 @@ paths:
                 $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
   
   # * Attiva o disattiva un modulo (PATCH)
+  # ! Senesi
   /modules/{id}: 
     patch: 
       description: >-
@@ -308,6 +318,7 @@ paths:
 
   # * Elenca i ruoli disponibili (GET) o ne crea uno nuovo (POST)
   # TODO: da fare
+  # ! Senesi
   /roles:
     get:
       summary: returns the users
@@ -351,6 +362,7 @@ paths:
               description: Link to the newly created user
             
   # * Modifica le informazioni relative ad un ruolo (PATCH)
+  # ! Senesi
   /roles/{id}: 
 
     patch: 
@@ -381,8 +393,9 @@ paths:
                 $ref: '#/components/schemas/RoleUpdate'
         '404':
           description: User not found
-
+  
   # * Ottiene una lista dei premi (GET) o ne crea uno nuovo (POST)
+  # ! Senesi
   /prizes: 
     get:
       summary: returns the prizes
@@ -427,6 +440,7 @@ paths:
               description: Link to the newly created user
 
   # * Modifica informazioni relative ad un premio (PATCH)
+  # ! Senesi
   /prizes/{id}: 
     patch: 
       summary: Partially update a Prize
@@ -458,6 +472,7 @@ paths:
           description: Prize not found
 
   # * Ottiene i dati relativi alla densità dei veicoli (GET)
+  # ! De Nato
   /traffic/density:
     get:
       summary: Retrieve individual car data
@@ -483,6 +498,7 @@ paths:
                   $ref: '#/components/schemas/CarObservation'
 
   # * Ottiene i dati relativi alla densità dei veicoli (GET)
+  # ! De Nato
   /traffic/cars:
     get:
       summary: Retrieve car density statistics
