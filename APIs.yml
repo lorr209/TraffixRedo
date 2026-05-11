@@ -61,6 +61,7 @@ paths:
     
   # * API che restituisce tutti i log nel sistema 
   #TODO Aggiungere eventuali filtri ?UserID=
+  # TODO: è una route protetta, indicarlo qui
   # ! Senesi
   /logs: 
     get:

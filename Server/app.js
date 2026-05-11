@@ -6,6 +6,7 @@ import tokenChecker from "./tokenChecker.js";
 import logs from "./logs.js";
 import mongoose from "mongoose";
 import "dotenv/config";
+import users from "./users.js";
 const port = process.env.PORT || 3000;
 const DB_connection = process.env.DASHBOARD_CONNECTION_STRING || null;
 
@@ -72,7 +73,7 @@ app.use("/test", test);
 // API effettive
 app.use("/auth", auth);
 app.use("/logs", tokenChecker, logs);
-
+app.use("/users", users);
 /*
   Serve front-end static files
  
