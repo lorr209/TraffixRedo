@@ -1,6 +1,8 @@
 import express from "express";
 import Log from "./models/log.js"; // Importa il modello di mongoose
 
+// * REQUEST EXAMPLE: curl -X GET http://localhost:3000/logs -H "x-access-token: yourtokenhere"
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {

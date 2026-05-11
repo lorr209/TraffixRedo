@@ -2,6 +2,8 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import User from "./models/user.js"; // Importa il modello di mongoose
 
+// * REQUEST EXAMPLE curl -X POST http://localhost:3000/auth  -H "Content-Type: application/json" -d "{\"email\":\"esempio@gmail.com\",\"password\":\"Hash_Esempio\"}"
+
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -21,7 +23,7 @@ router.post("/", async (req, res) => {
 		//*other_data: encrypted_in_the_token,
 	};
 
-	var options = { expiresIn: 30 }; // expires in 30s
+	var options = { expiresIn: 300 }; // expires in 5min
 
 	var token = jwt.sign(payload, process.env.SUPER_SECRET, options);
 

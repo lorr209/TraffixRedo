@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import test from "./test.js";
 import auth from "./auth.js";
+import tokenChecker from "./tokenChecker.js";
 import logs from "./logs.js";
 import mongoose from "mongoose";
 import "dotenv/config";
@@ -33,9 +34,9 @@ app.use('/', express.static('static')); // expose also this folder
 
 
 
-/**
- * Serve openAPI
- 
+/**!
+!!! * Serve openAPI
+!!!----------------------------- 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
@@ -66,9 +67,11 @@ console.log("Connections initialized...");
 // Test
 app.use("/test", test);
 
+// API protette
+
 // API effettive
 app.use("/auth", auth);
-app.use("/logs", logs);
+app.use("/logs", tokenChecker, logs);
 
 /*
   Serve front-end static files
