@@ -1,51 +1,23 @@
 <script setup>
-	import { ref } from "vue";
+	import { ref, watch } from "vue";
 
-	defineProps({
-		msg: String,
+	const call = ref("");
+	const result = ref("");
+
+	watch(call, async (newValue) => {
+		fetch(call.value)
+			.then((r) => r.json())
+			.then((data) => {
+				console.log(data);
+				result.value = data;
+			});
 	});
-
-	const count = ref(0);
-
-	const serverHello = ref({});
-
-	fetch("/api/v1/hello")
-		.then((r) => r.json())
-		.then(({ message }) => {
-			serverHello.value = message;
-		});
 </script>
 
 <template>
-	<h1>{{ msg }}</h1>
-	<h2>{{ serverHello }}</h2>
 	<div class="card">
-		<button type="button" @click="count++">count is {{ count }}</button>
-		<p>
-			Edit
-			<code>components/HelloWorld.vue</code> to test HMR
-		</p>
+		<input v-model="call" placeholder="Type here" />
+		<p id="Called">{{ call }}</p>
+		<p id="Result">{{ result }}</p>
 	</div>
-
-	<p>
-		Check out
-		<a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-			>create-vue</a
-		>, the official Vue + Vite starter
-	</p>
-	<p>
-		Learn more about IDE Support for Vue in the
-		<a
-			href="https://vuejs.org/guide/scaling-up/tooling.html#ide-support"
-			target="_blank"
-			>Vue Docs Scaling up Guide</a
-		>.
-	</p>
-	<p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
 </template>
-
-<style scoped>
-	.read-the-docs {
-		color: #888;
-	}
-</style>

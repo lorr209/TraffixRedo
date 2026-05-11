@@ -3,10 +3,10 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
-	"main": "server/index.js",
+	"main": "index.js",
 	"scripts": {
-		"dev:frontend": "vite",
-		"dev:backend": "nodemon server/index.js",
+		"dev:frontend": "vite build",
+		"dev:backend": "nodemon index.js",
 		"dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'",
 		"build": "vite build",
 		"preview": "vite preview"
