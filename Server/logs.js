@@ -1,5 +1,6 @@
 import express from "express";
 import Log from "./models/log.js"; // Importa il modello di mongoose
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {

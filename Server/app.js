@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import test from "./test.js";
+import auth from "./auth.js";
 import logs from "./logs.js";
 import mongoose from "mongoose";
 import "dotenv/config";
@@ -10,7 +11,11 @@ const DB_connection = process.env.DASHBOARD_CONNECTION_STRING || null;
 // Setup iniziale
 const app = express();
 
+// Abilita cors
 app.use(cors());
+
+// Abilita la lettura di file JSON
+app.use(express.json());
 
 // Serve la pagina di vue (Va buildata in precedenza)
 app.use("/", express.static("dist"));
@@ -61,6 +66,8 @@ console.log("Connections initialized...");
 // Test
 app.use("/test", test);
 
+// API effettive
+app.use("/auth", auth);
 app.use("/logs", logs);
 
 /*
