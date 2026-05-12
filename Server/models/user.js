@@ -5,6 +5,9 @@ export default mongoose.model(
 	"Utenti",
 	new Schema(
 		{
+			Attivo: {
+				type: Boolean,
+			},
 			Nome: {
 				type: String,
 			},
@@ -20,7 +23,7 @@ export default mongoose.model(
 			Data_Creazione: {
 				type: Date,
 			},
-			Id_Ruolo: {
+			Ruolo: {
 				type: Schema.Types.ObjectId,
 			},
 		},
