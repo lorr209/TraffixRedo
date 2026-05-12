@@ -6,11 +6,6 @@ import User from "./models/user.js"; // Importa il modello di mongoose
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-	/* if (!req.usergedUser) {
-    return;
-  } */
-
-	// https://mongoosejs.com/docs/api.html#model_Model.find
 	let users = await User.find({});
 
 	users = users.map((user) => {
@@ -30,7 +25,21 @@ router.get("/", async (req, res) => {
 
 router.post("/", (req, res) => {});
 
-router.get("/:id", (req, res) => {});
+router.get("/:id", async (req, res) => {
+	let user = await User.findOne({ _id: req.params.id }).exec();
+	console.log(user);
+	const response = {
+		self: "/users/" + user._id,
+		attivo: user.Attivo, // Da aggiungere su mongo
+		email: user.Email,
+		nome: user.Nome,
+		cognome: user.Cognome,
+		data: user.Data_Creazione,
+		ruolo: user.Ruolo,
+	};
+
+	res.status(200).json(response);
+});
 
 router.patch("/:id/password", (req, res) => {});
 

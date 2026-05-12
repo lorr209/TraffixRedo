@@ -74,6 +74,7 @@ app.use("/test", test);
 app.use("/auth", auth);
 app.use("/logs", tokenChecker, logs);
 app.use("/users", users);
+
 /*
   Serve front-end static files
  
