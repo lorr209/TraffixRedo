@@ -6,7 +6,13 @@ import Log from "./models/log.js"; // Importa il modello di mongoose
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-	let logs = await Log.find({});
+	const { id } = req.query;
+
+	const filter = id ? { Id_Utente: id } : {};
+
+	let logs = await Log.find(filter).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
 
 	logs = logs.map((log) => {
 		return {

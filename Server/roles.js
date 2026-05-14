@@ -1,30 +1,75 @@
 import express from "express";
-import Ruolo from "./models/role.js";
-import Visualizza from "./models/visualizza.js";
+import Role from "./models/role.js"; // Importa il modello di mongoose
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-    try {
-        let ruoli = await Ruolo.find({});
+	let roles = await Role.find({});
 
-        const risposta = await Promise.all(ruoli.map(async (r) => {
-            
-            const associazioni = await Visualizza.find({ Id_Ruolo: r._id }).populate("Id_Modulo"); // Otteniamo i dati del Modulo
+	roles = roles.map((role) => {
+		return {
+			self: "/roles/" + role._id,
+			nome: role.attivo,
+			descrizione: role.descrizione,
+			moduli: role.moduli,
+		};
+	});
 
-            return {
-                self: "/ruolo/" + r._id,
-                nome: r.Nome,
-                descrizione: r.Descrizione,
-                moduli: associazioni.map(a => a.Id_Modulo) 
-            };
-        }));
+	res.status(200).json(roles);
+});
 
-        res.status(200).json(risposta);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Errore nel recupero dei ruoli e moduli" });
-    }
+// * curl -X POST http://localhost:3000/roles -H "Content-Type: application/json" -d "{\"nome\":\"Test\",\"descrizione\":\"Ruolo di test\",\"moduli\":[]}"
+router.post("/", async (req, res) => {
+	const { nome, descrizione, moduli } = req.body;
+
+	const alreadyStored = await Role.findOne({ nome: nome });
+	if (alreadyStored) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Role already present" });
+	}
+
+	let role = new Role({
+		nome: nome,
+		descrizione: descrizione,
+		moduli: moduli,
+	});
+
+	role = await role.save().catch((e) => {
+		return res
+			.status(500)
+			.json({ success: false, message: "Internal server error" });
+	});
+
+	let roleID = role._id;
+
+	res
+		.location("/role/" + roleID)
+		.status(201)
+		.send();
+});
+
+// * curl -X PATCH http://localhost:3000/roles/6a04eb8b8338a04e2783415d -H "Content-Type: application/json" -d "{\"nome\":\"TestConMappa\",\"descrizione\":\"Ruolo di test che può vedere una mappa\",\"moduli\":[\"6a04dc91dc20e82d65f68209\"]}"
+router.patch("/:id", async (req, res) => {
+	const { id } = req.params;
+
+	// * NOTA: req.body deve avere i nomi dei parametri che matchano con quelli su mongoose
+	const updatedRole = await Role.findByIdAndUpdate(id, req.body, {
+		returnDocument: "after",
+		runValidators: true,
+	}).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
+
+	if (!updatedRole) {
+		return res.status(404).json({ success: false, message: "Role not found" });
+	}
+
+	res.status(200).json({
+		success: true,
+		message: "Role updated successfully",
+		role: updatedRole,
+	});
 });
 
 export default router;

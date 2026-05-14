@@ -2,24 +2,24 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export default mongoose.model(
-	"Moduli",
+	"Densità",
 	new Schema(
 		{
-			attivo: {
-				type: Boolean,
+			data: {
+				type: Date,
 			},
-			nome: {
-				type: String,
+			lat: {
+				type: Number,
 			},
-			descrizione: {
-				type: String,
+			lon: {
+				type: Number,
 			},
-			percorso: {
-				type: String,
+			quantità: {
+				type: Number,
 			},
 		},
 		{
-			collection: "Moduli",
+			collection: "Densità",
 			versionKey: false,
 		},
 	),

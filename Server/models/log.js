@@ -14,6 +14,7 @@ export default mongoose.model(
 		},
 		{
 			collection: "Log_Accessi",
+			versionKey: false,
 		},
 	),
 );

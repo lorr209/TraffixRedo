@@ -5,30 +5,31 @@ export default mongoose.model(
 	"Utenti",
 	new Schema(
 		{
-			Attivo: {
+			attivo: {
 				type: Boolean,
 			},
-			Nome: {
+			nome: {
 				type: String,
 			},
-			Cognome: {
+			cognome: {
 				type: String,
 			},
-			Email: {
+			email: {
 				type: String,
 			},
-			Password: {
+			password: {
 				type: String,
 			},
-			Data_Creazione: {
+			creato: {
 				type: Date,
 			},
-			Ruolo: {
+			ruolo: {
 				type: Schema.Types.ObjectId,
 			},
 		},
 		{
 			collection: "Utenti",
+			versionKey: false,
 		},
 	),
 );

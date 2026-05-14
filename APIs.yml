@@ -13,7 +13,7 @@ servers:
 paths:
 
   # * API per l'autenticazione
-  # ! De Nato
+  # ? Tecnicamente funzionanete, mancante gestione codici e gestione parametri non funzionanti su ?id=
   /auth:
     post:
       summary: Authenticate a user
@@ -62,7 +62,7 @@ paths:
   # * API che restituisce tutti i log nel sistema 
   #TODO Aggiungere eventuali filtri ?UserID=
   # TODO: è una route protetta, indicarlo qui
-  # ! Senesi
+  # ? Tecnicamente funzionante, aggiungere gestione codici
   /logs: 
     get:
       summary: Return the logs
@@ -85,7 +85,8 @@ paths:
                   $ref: '#/components/schemas/LogEntry' #!! CORREGGERE
 
   # * API per ottenere una lista degli utenti (GET) o per crearne uno nuovo (POST)
-  # ! De Nato
+  # ? Tecnicamente funzionante, controllare codici HTTP e gestione parametri non validi su ?role=
+  # ? aggiungere regex email
   /users:
     get:
       summary: returns the users
@@ -130,7 +131,8 @@ paths:
 
   # * API per ottenere i dettagli di un utente specifico (GET)
   # * o per modificarne alcuni campi (PATCH)
-  # ! De Nato
+  # ? Tecnicamente funzionante, controllare codici HTTP e gestione parametri non validi su ?role=
+  # ? aggiungere regex email
   /users/{userID}: 
     get: 
       description: >-
@@ -183,8 +185,7 @@ paths:
           description: User not found
 
   # * API per modificare la password di un utente (PATCH) 
-  # ! De Nato
-  # ? o PUT?
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /users/{userID}/password:
     patch: 
       description: >-
@@ -231,7 +232,7 @@ paths:
           description: User not found
 
   # * API per ottenere i moduli accessibili dall'utente, legati al ruolo (GET)
-  # ! De Nato
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /users/{id}/moduli:                      #? rimandiamo all'user quale moduli richiedere ma poi facciamo comunque controlli?? e come li mandiamo 
     get:
       summary: Retrieve available modules
@@ -248,7 +249,7 @@ paths:
                   type: string       #* IDs
 
   # * API per ottenere una lista delle lamentale (GET)
-  # ! Senesi
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /complaints: 
     get:
       summary: returns the complaints
@@ -270,9 +271,8 @@ paths:
                 items: 
                 $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
 
-
   # * Cerca tutti i moduli nel sistema (GET)
-  # ! Senesi
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /modules: 
     get:
       summary: returns the modules
@@ -294,7 +294,7 @@ paths:
                 $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
   
   # * Attiva o disattiva un modulo (PATCH)
-  # ! Senesi
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /modules/{id}: 
     patch: 
       description: >-
@@ -318,18 +318,13 @@ paths:
           description: "module not found"
 
   # * Elenca i ruoli disponibili (GET) o ne crea uno nuovo (POST)
-  # TODO: da fare
-  # ! Senesi
+  # TODO: da fare documento
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /roles:
     get:
       summary: returns the users
       description: >-
-        Retrieve all users from the database.
-      parameters:                             # * Query opzionale ?role= per filtrare
-        - in: query
-          name: role
-          schema:
-            type: string
+        Retrieve all users from the database.    
       responses:
         "200":
           description: "Collections of users"
@@ -363,7 +358,7 @@ paths:
               description: Link to the newly created user
             
   # * Modifica le informazioni relative ad un ruolo (PATCH)
-  # ! Senesi
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /roles/{id}: 
 
     patch: 
@@ -396,7 +391,7 @@ paths:
           description: User not found
   
   # * Ottiene una lista dei premi (GET) o ne crea uno nuovo (POST)
-  # ! Senesi
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /prizes: 
     get:
       summary: returns the prizes
@@ -441,7 +436,7 @@ paths:
               description: Link to the newly created user
 
   # * Modifica informazioni relative ad un premio (PATCH)
-  # ! Senesi
+  # ? Tecnicamente funzionante, controllare codici HTTP
   /prizes/{id}: 
     patch: 
       summary: Partially update a Prize
@@ -473,8 +468,8 @@ paths:
           description: Prize not found
 
   # * Ottiene i dati relativi alla densità dei veicoli (GET)
-  # ! De Nato
-  /traffic/density:
+  # ? Tecnicamente funzionante, controllare codici HTTP
+  /traffic/densities:
     get:
       summary: Retrieve individual car data
       tags:
@@ -499,8 +494,8 @@ paths:
                   $ref: '#/components/schemas/CarObservation'
 
   # * Ottiene i dati relativi alla densità dei veicoli (GET)
-  # ! De Nato
-  /traffic/cars:
+  # ? Tecnicamente funzionante, controllare codici HTTP
+  /traffic/vehicles:
     get:
       summary: Retrieve car density statistics
       tags:

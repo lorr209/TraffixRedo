@@ -2,24 +2,28 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export default mongoose.model(
-	"Moduli",
+	"Lamentele",
 	new Schema(
 		{
-			attivo: {
-				type: Boolean,
+			lat: {
+				type: Number,
 			},
-			nome: {
+			lon: {
+				type: Number,
+			},
+			tipo: {
 				type: String,
+				enum: ["traffico", "tpl"],
 			},
-			descrizione: {
-				type: String,
+			data: {
+				type: Date,
 			},
-			percorso: {
+			testo: {
 				type: String,
 			},
 		},
 		{
-			collection: "Moduli",
+			collection: "Lamentele",
 			versionKey: false,
 		},
 	),

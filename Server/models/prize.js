@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export default mongoose.model(
-	"Moduli",
+	"Premi",
 	new Schema(
 		{
 			attivo: {
@@ -14,12 +14,18 @@ export default mongoose.model(
 			descrizione: {
 				type: String,
 			},
-			percorso: {
-				type: String,
+			costo: {
+				type: Number,
+			},
+			creato: {
+				type: Date,
+			},
+			termina: {
+				type: Date,
 			},
 		},
 		{
-			collection: "Moduli",
+			collection: "Premi",
 			versionKey: false,
 		},
 	),
