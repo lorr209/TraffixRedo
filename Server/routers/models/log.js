@@ -5,10 +5,10 @@ export default mongoose.model(
 	"Log_Accessi",
 	new Schema(
 		{
-			Data: {
+			data: {
 				type: Date,
 			},
-			Id_Utente: {
+			utente: {
 				type: Schema.Types.ObjectId,
 			},
 		},

@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 			email: user.email,
 			nome: user.nome,
 			cognome: user.cognome,
-			data: user.creato,
+			creato: user.creato,
 			ruolo: user.ruolo,
 		};
 	});
@@ -35,8 +35,12 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
 	const { nome, cognome, email, password, ruolo } = req.body;
 
-	const alreadyStored = await User.findOne({ email: email });
-	if (alreadyStored) {
+	if (!nome || !cognome || !email || !password || !ruolo) {
+		return res.status(400).json({ success: false, message: "Invalid data" });
+	}
+
+	const alreadyStored = await User.find({ email: email });
+	if (alreadyStored[0]) {
 		return res
 			.status(400)
 			.json({ success: false, message: "User already present" });
@@ -60,10 +64,8 @@ router.post("/", async (req, res) => {
 			.json({ success: false, message: "Internal server error" });
 	});
 
-	let userID = user._id;
-
 	res
-		.location("/user/" + userID)
+		.location("/user/" + user._id)
 		.status(201)
 		.send();
 });
@@ -71,9 +73,13 @@ router.post("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
 	const { id } = req.params;
 
-	let user = await User.findOne({ _id: id }).catch((e) => {
+	let user = await User.findById(id).catch((e) => {
 		return res.status(400).json({ success: false, message: "Invalid query" });
 	});
+
+	if (!user) {
+		return res.status(404).json({ success: false, message: "User not found" });
+	}
 
 	const response = {
 		self: "/users/" + user._id,
@@ -81,7 +87,7 @@ router.get("/:id", async (req, res) => {
 		email: user.email,
 		nome: user.nome,
 		cognome: user.cognome,
-		data: user.creato,
+		creato: user.creato,
 		ruolo: user.ruolo,
 	};
 
@@ -94,7 +100,6 @@ router.patch("/:id", async (req, res) => {
 	// * NOTA: req.body deve avere i nomi dei parametri che matchano con quelli su mongoose
 	const updatedUser = await User.findByIdAndUpdate(id, req.body, {
 		returnDocument: "after",
-		runValidators: true,
 	}).catch((e) => {
 		return res.status(400).json({ success: false, message: "Invalid query" });
 	});
@@ -139,13 +144,16 @@ router.patch("/:id/password", async (req, res) => {
 
 router.get("/:id/moduli", async (req, res) => {
 	const { id } = req.params;
-	const { ruolo } = await User.findOne({ _id: id })
-		.select("ruolo")
-		.catch((e) => {
-			return res.status(400).json({ success: false, message: "Invalid query" });
-		});
 
-	const { moduli } = await Role.findOne({ _id: ruolo });
+	const user = await User.findById(id).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
+
+	if (!user) {
+		return res.status(404).json({ success: false, message: "User not found" });
+	}
+
+	const { moduli } = await Role.findById(user.ruolo);
 
 	res.status(200).json(moduli);
 });

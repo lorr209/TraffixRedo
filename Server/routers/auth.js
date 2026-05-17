@@ -9,13 +9,13 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
 	const { email, password } = req.body;
-	let user = await User.findOne({ Email: email });
+	let user = await User.findOne({ email: email });
 
 	if (!user) {
 		return res.status(404).json({ success: false, message: "User not found" });
 	}
 
-	const validPass = await bcrypt.compare(password, user.Password);
+	const validPass = await bcrypt.compare(password, user.password);
 	if (!validPass) {
 		return res
 			.status(401)

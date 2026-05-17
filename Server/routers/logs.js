@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
 	const { id } = req.query;
 
-	const filter = id ? { Id_Utente: id } : {};
+	const filter = id ? { utente: id } : {};
 
 	let logs = await Log.find(filter).catch((e) => {
 		return res.status(400).json({ success: false, message: "Invalid query" });
@@ -16,9 +16,8 @@ router.get("/", async (req, res) => {
 
 	logs = logs.map((log) => {
 		return {
-			self: "/logs/" + log._id,
-			data: log.Data,
-			id_Utente: log.Id_Utente,
+			data: log.data,
+			utente: log.utente,
 		};
 	});
 

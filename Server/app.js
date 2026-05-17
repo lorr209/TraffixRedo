@@ -1,19 +1,21 @@
 import express from "express";
 import cors from "cors";
-import test from "./test.js";
-import auth from "./auth.js";
-import tokenChecker from "./tokenChecker.js";
-import logs from "./logs.js";
 import mongoose from "mongoose";
-import users from "./users.js";
-import modules from "./modules.js";
-import roles from "./roles.js";
-import complaints from "./complaints.js";
-import traffic from "./traffic.js";
-import prizes from "./prizes.js";
+import "dotenv/config";
+
+import APItest from "./routers/APItest.js";
+import auth from "./routers/auth.js";
+import tokenChecker from "./routers/tokenChecker.js";
+import logs from "./routers/logs.js";
+import users from "./routers/users.js";
+import modules from "./routers/modules.js";
+import roles from "./routers/roles.js";
+import complaints from "./routers/complaints.js";
+import traffic from "./routers/traffic.js";
+import prizes from "./routers/prizes.js";
 
 // ? Sarebbe un failsafe ma non avendo static (e non sapendo se implementarlo) non so se sia necessario
-const frontend = process.env.FRONTED || "static";
+const frontend = process.env.FRONTEND || "static";
 
 // Setup iniziale
 const app = express();
@@ -28,14 +30,12 @@ app.use(express.json());
 app.use("/", express.static(frontend));
 
 // Test
-app.use("/test", test);
-
-// API protette
+app.use("/APItest", APItest);
 
 // API effettive
 app.use("/auth", auth);
 app.use("/logs", tokenChecker, logs);
-app.use("/users", users);
+app.use("/users", tokenChecker, users);
 app.use("/modules", modules);
 app.use("/roles", roles);
 app.use("/complaints", complaints);
