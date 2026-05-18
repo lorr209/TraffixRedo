@@ -1,42 +1,51 @@
-<!--<script setup>
-	import HelloWorld from "./components/HelloWorld.vue";
-</script>
-
-<template>
-	<div>
-		<a href="https://vite.dev" target="_blank">
-			<img src="/vite.svg" class="logo" alt="Vite logo" />
-		</a>
-		<a href="https://vuejs.org/" target="_blank">
-			<img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-		</a>
-	</div>
-	<HelloWorld msg="AS + Vue" />
-</template>
-
-<style scoped>
-	.logo {
-		height: 6em;
-		padding: 1.5em;
-		will-change: filter;
-		transition: filter 300ms;
-	}
-	.logo:hover {
-		filter: drop-shadow(0 0 2em #646cffaa);
-	}
-	.logo.vue:hover {
-		filter: drop-shadow(0 0 2em #42b883aa);
-	}
-</style>
--->
 <script setup>
-	import { onBeforeMount } from "vue";
-	import HelloWorld from "../../components/HelloWorld.vue";
+	import { onBeforeMount, ref } from "vue";
+	import HeaderMain from "../../components/HeaderMain.vue";
+	import SidebarMain from "../../components/SidebarMain.vue";
+
+	const isSidebarOpen = ref(false);
+
+	const toggleSidebar = () => {
+		isSidebarOpen.value = !isSidebarOpen.value;
+	};
 </script>
 
 <template>
-	<div>
-		<h1>Welcome to the Main Application</h1>
-	</div>
-	<HelloWorld />
+	<HeaderMain @toggle-sidebar="toggleSidebar" />
+
+	<SidebarMain :isOpen="isSidebarOpen" @close-sidebar="isSidebarOpen = false" />
+
+	<main>
+		<div class="modules">
+			<div class="body-modules">Modulo 1</div>
+			<div class="body-modules w2 h2">Modulo 2</div>
+			<div class="body-modules h2">Modulo 3</div>
+			<div class="body-modules">Modulo 4</div>
+			<div class="body-modules w2 h3">Modulo 5</div>
+			<div class="body-modules h3">Modulo 6</div>
+		</div>
+	</main>
+
+	<footer class="view-options">
+		<div>
+			<span>Visualizzazione: </span>
+			<button id="grid-view-btn">Griglia</button>
+			<button id="list-view-btn">Lista</button>
+		</div>
+
+		<div class="zoom-controls">
+			<span>Zoom: </span>
+			<button id="zoom-out">−</button>
+			<input
+				type="range"
+				id="zoom-range"
+				min="0.5"
+				max="2"
+				step="0.1"
+				value="1"
+			/>
+			<button id="zoom-in">+</button>
+			<span id="zoom-value">100%</span>
+		</div>
+	</footer>
 </template>
