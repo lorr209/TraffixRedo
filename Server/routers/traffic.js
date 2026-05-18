@@ -9,7 +9,6 @@ router.get("/densities", async (req, res) => {
 
 	densities = densities.map((density) => {
 		return {
-			self: "/densities/" + density._id,
 			data: density.data,
 			lat: density.lat,
 			lon: density.lon,
@@ -25,7 +24,6 @@ router.get("/vehicles", async (req, res) => {
 
 	vehicles = vehicles.map((vehicle) => {
 		return {
-			self: "/vehicle/" + vehicle._id,
 			data: vehicle.data,
 			lat: vehicle.lat,
 			lon: vehicle.lon,

@@ -9,6 +9,13 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
 	const { email, password } = req.body;
+
+	if (!email || !password) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Arguments not found" });
+	}
+
 	let user = await User.findOne({ email: email });
 
 	if (!user) {
@@ -16,6 +23,7 @@ router.post("/", async (req, res) => {
 	}
 
 	const validPass = await bcrypt.compare(password, user.password);
+
 	if (!validPass) {
 		return res
 			.status(401)
@@ -38,7 +46,7 @@ router.post("/", async (req, res) => {
 		token: token,
 		email: user.email,
 		id: user._id,
-		self: "auth/" + user._id,
+		self: "users/" + user._id,
 	};
 
 	return res.status(200).json(response);

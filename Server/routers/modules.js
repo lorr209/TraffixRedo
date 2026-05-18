@@ -18,6 +18,30 @@ router.get("/", async (req, res) => {
 	res.status(200).json(modules);
 });
 
+router.get("/:id", async (req, res) => {
+	const { id } = req.params;
+
+	let module = await Module.findById(id).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
+
+	if (!module) {
+		return res
+			.status(404)
+			.json({ success: false, message: "Module not found" });
+	}
+
+	response = {
+		self: "/modules/" + module._id,
+		attivo: module.attivo,
+		nome: module.nome,
+		descrizione: module.descrizione,
+		percorso: module.percorso,
+	};
+
+	res.status(200).json(response);
+});
+
 //curl -X PATCH http://localhost:3000/modules/6a04dcc1dc20e82d65f6820a -H "Content-Type: application/json" -d "{\"attivo\":true}"
 router.patch("/:id", async (req, res) => {
 	const { id } = req.params;

@@ -14,16 +14,52 @@ router.get("/", async (req, res) => {
 			descrizione: prize.descrizione,
 			costo: prize.costo,
 			creato: prize.creato,
-			prize: prize.termina,
+			termina: prize.termina,
 		};
 	});
 
 	res.status(200).json(prizes);
 });
 
+router.get("/:id", async (req, res) => {
+	const { id } = req.params;
+
+	let prize = await Prize.findById(id).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
+
+	if (!prize) {
+		return res.status(404).json({ success: false, message: "Prize not found" });
+	}
+
+	response = {
+		self: "/prizes/" + prize._id,
+		attivo: prize.attivo,
+		nome: prize.nome,
+		descrizione: prize.descrizione,
+		costo: prize.costo,
+		creato: prize.creato,
+		termina: prize.termina,
+	};
+
+	res.status(200).json(response);
+});
+
 // * curl -X POST http://localhost:3000/prizes -H "Content-Type: application/json" -d "{\"attivo\": true, \"nome\":\"Test\",\"descrizione\":\"Premio di test\",\"costo\":9999,\"termina\":\"2026-12-31T23:00:00.000+00:00\"}"
 router.post("/", async (req, res) => {
 	const { attivo, nome, descrizione, costo, termina } = req.body;
+
+	if (
+		typeof attivo !== "boolean" ||
+		!nome ||
+		!descrizione ||
+		!costo ||
+		!termina
+	) {
+		return res
+			.status(400)
+			.json({ success: false, message: "Invalid Arguments" });
+	}
 
 	const alreadyStored = await Prize.findOne({ nome: nome });
 	if (alreadyStored) {
@@ -47,12 +83,20 @@ router.post("/", async (req, res) => {
 			.json({ success: false, message: "Internal server error" });
 	});
 
-	let prizeID = prize._id;
+	const createdPrize = {
+		self: "/prizes/" + prize._id,
+		attivo: prize.attivo,
+		nome: prize.nome,
+		descrizione: prize.descrizione,
+		costo: prize.costo,
+		creato: prize.creato,
+		termina: prize.termina,
+	};
 
 	res
-		.location("/prize/" + prizeID)
+		.location("/prize/" + prize._id)
 		.status(201)
-		.send();
+		.json(createdPrize);
 });
 
 // * curl -X PATCH http://localhost:3000/prizes/6a04fa08c134aaeb67d9908b -H "Content-Type: application/json" -d "{\"nome\":\"Test2\", \"termina\":\"2026-08-31T23:00:00.000+00:00\"}"

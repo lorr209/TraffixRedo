@@ -36,11 +36,11 @@ app.use("/APItest", APItest);
 app.use("/auth", auth);
 app.use("/logs", tokenChecker, logs);
 app.use("/users", tokenChecker, users);
-app.use("/modules", modules);
-app.use("/roles", roles);
-app.use("/complaints", complaints);
-app.use("/traffic", traffic);
-app.use("/prizes", prizes);
+app.use("/modules", tokenChecker, modules);
+app.use("/roles", tokenChecker, roles);
+app.use("/complaints", tokenChecker, complaints);
+app.use("/traffic", tokenChecker, traffic);
+app.use("/prizes", tokenChecker, prizes);
 /*
 ! Ricorda logica per reindirizzare alla pagina di login
 ! Tecnicamente da gestire da vue, credo

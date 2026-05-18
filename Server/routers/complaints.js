@@ -20,4 +20,29 @@ router.get("/", async (req, res) => {
 	res.status(200).json(complaints);
 });
 
+router.get("/:id", async (req, res) => {
+	const { id } = req.params;
+
+	let complaint = await Complaint.findById(id).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
+
+	if (!complaint) {
+		return res
+			.status(404)
+			.json({ success: false, message: "Complaint not found" });
+	}
+
+	response = {
+		self: "/complaints/" + complaint._id,
+		lat: complaint.lat,
+		lon: complaint.lon,
+		tipo: complaint.tipo,
+		data: complaint.data,
+		testo: complaint.testo,
+	};
+
+	res.status(200).json(response);
+});
+
 export default router;

@@ -12,6 +12,7 @@ const {
 
 let userSpy;
 let userSpyFindById;
+let userSpyFindOne;
 let userSpySave;
 let userSpyFindByIdAndUpdate;
 let roleSpyFindById;
@@ -59,7 +60,6 @@ const mockCreatedUser = {
 const mockRoles = [
 	{
 		_id: "aaaaaaaaaaaaaaaaaaaaaaaa",
-		creato: "2000-00-00T00:00:00.000Z",
 		nome: "Ruolo1",
 		descrizione: "Ruolo uno",
 		moduli: [
@@ -70,14 +70,12 @@ const mockRoles = [
 	},
 	{
 		_id: "bbbbbbbbbbbbbbbbbbbbbbbb",
-		creato: "2000-00-00T00:00:00.000Z",
 		nome: "Ruolo2",
 		descrizione: "Ruolo due",
 		moduli: ["a1a1a1a1a1a1a1a1a1a1a1a1", "b2b2b2b2b2b2b2b2b2b2b2b2"],
 	},
 	{
 		_id: "cccccccccccccccccccccccc",
-		creato: "2000-00-00T00:00:00.000Z",
 		nome: "Ruolo3",
 		descrizione: "Ruolo true",
 		moduli: ["a1a1a1a1a1a1a1a1a1a1a1a1"],
@@ -87,7 +85,7 @@ const mockRoles = [
 beforeAll(() => {
 	userSpy = jest.spyOn(User, "find").mockImplementation(async (query) => {
 		return mockUsers.filter((user) => {
-			if (!query || Object.keys(query).lenght === 0) {
+			if (!query || Object.keys(query).length === 0) {
 				return true;
 			} else {
 				return Object.keys(query).every((key) => user[key] === query[key]);
@@ -106,6 +104,19 @@ beforeAll(() => {
 				return user._id === id ? true : false;
 			});
 
+			return result[0];
+		});
+
+	userSpyFindOne = jest
+		.spyOn(User, "findOne")
+		.mockImplementation(async (query) => {
+			const result = mockUsers.filter((user) => {
+				if (!query || Object.keys(query).length === 0) {
+					return true;
+				} else {
+					return Object.keys(query).every((key) => user[key] === query[key]);
+				}
+			});
 			return result[0];
 		});
 
@@ -159,7 +170,7 @@ var token = jwt.sign(
 	{
 		expiresIn: 300,
 	},
-); // create a valid token
+);
 
 describe("GET /users", () => {
 	// * Testa 401
@@ -168,7 +179,7 @@ describe("GET /users", () => {
 			.get("/users")
 			.expect(401)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -180,7 +191,7 @@ describe("GET /users", () => {
 			.set("Accept", "application/json")
 			.expect(403)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -214,7 +225,7 @@ describe("GET /users", () => {
 			.set("Content-Type", "application/json")
 			.expect(400)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -226,7 +237,7 @@ describe("GET /users", () => {
 			.set("Content-Type", "application/json")
 			.expect(404)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -260,7 +271,7 @@ describe("GET /users", () => {
 			.set("Content-type", "application/json")
 			.expect(400)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -272,7 +283,7 @@ describe("GET /users", () => {
 			.set("Content-Type", "application/json")
 			.expect(404)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -302,7 +313,7 @@ describe("POST /users", () => {
 			.post("/users")
 			.expect(401)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -314,7 +325,7 @@ describe("POST /users", () => {
 			.set("Accept", "application/json")
 			.expect(403)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -327,7 +338,7 @@ describe("POST /users", () => {
 			.send({})
 			.expect(400)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -346,7 +357,7 @@ describe("POST /users", () => {
 			})
 			.expect(400)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -363,7 +374,18 @@ describe("POST /users", () => {
 				password: "password",
 				ruolo: "aaaaaaaaaaaaaaaaaaaaaaaa",
 			})
-			.expect(201);
+			.expect(201)
+			.then((res) => {
+				expect(res.body).toEqual({
+					self: "/users/444444444444444444444444",
+					attivo: true,
+					email: "fakeuser4@mail.com",
+					nome: "fake",
+					cognome: "quattro",
+					creato: "2000-00-00T00:00:00.000Z",
+					ruolo: "aaaaaaaaaaaaaaaaaaaaaaaa",
+				});
+			});
 	});
 });
 
@@ -375,7 +397,7 @@ describe("PATCH /users", () => {
 			.patch("/users")
 			.expect(401)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -387,7 +409,7 @@ describe("PATCH /users", () => {
 			.set("Accept", "application/json")
 			.expect(403)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -399,7 +421,7 @@ describe("PATCH /users", () => {
 			.set("Content-Type", "application/json")
 			.expect(400)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 
@@ -414,7 +436,7 @@ describe("PATCH /users", () => {
 			})
 			.expect(404)
 			.then((res) => {
-				expect(res.body.success === false);
+				expect(res.body.success).toEqual(false);
 			});
 	});
 

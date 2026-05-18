@@ -36,11 +36,14 @@ router.post("/", async (req, res) => {
 	const { nome, cognome, email, password, ruolo } = req.body;
 
 	if (!nome || !cognome || !email || !password || !ruolo) {
-		return res.status(400).json({ success: false, message: "Invalid data" });
+		return res
+			.status(400)
+			.json({ success: false, message: "Invalid Arguments" });
 	}
 
-	const alreadyStored = await User.find({ email: email });
-	if (alreadyStored[0]) {
+	const alreadyStored = await User.findOne({ email: email });
+
+	if (alreadyStored) {
 		return res
 			.status(400)
 			.json({ success: false, message: "User already present" });
@@ -64,10 +67,20 @@ router.post("/", async (req, res) => {
 			.json({ success: false, message: "Internal server error" });
 	});
 
+	const createdUser = {
+		self: "/users/" + user._id,
+		attivo: user.attivo,
+		nome: user.nome,
+		cognome: user.cognome,
+		email: user.email,
+		creato: user.creato,
+		ruolo: user.ruolo,
+	};
+
 	res
 		.location("/user/" + user._id)
 		.status(201)
-		.send();
+		.json(createdUser);
 });
 
 router.get("/:id", async (req, res) => {
