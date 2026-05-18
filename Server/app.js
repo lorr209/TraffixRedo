@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 
-import APItest from "./routers/APItest.js";
 import auth from "./routers/auth.js";
 import tokenChecker from "./routers/tokenChecker.js";
 import logs from "./routers/logs.js";
@@ -16,6 +16,8 @@ import prizes from "./routers/prizes.js";
 
 // ? Sarebbe un failsafe ma non avendo static (e non sapendo se implementarlo) non so se sia necessario
 const frontend = process.env.FRONTEND || "static";
+const loginPage = frontend + "/login.html";
+const assets = frontend + "/assets";
 
 // Setup iniziale
 const app = express();
@@ -26,14 +28,17 @@ app.use(cors());
 // Abilita la lettura di file JSON
 app.use(express.json());
 
-// Serve la pagina di vue (Va buildata in precedenza)
-app.use("/", express.static(frontend));
+// Abilita cookies
+app.use(cookieParser());
 
-// Test
-app.use("/APItest", APItest);
-
-// API effettive
+// Ruotes pubbliche
 app.use("/auth", auth);
+app.use("/login.html", express.static(loginPage));
+app.use("/assets", express.static(assets));
+
+// Routes protette
+app.use("/", tokenChecker, express.static(frontend));
+
 app.use("/logs", tokenChecker, logs);
 app.use("/users", tokenChecker, users);
 app.use("/modules", tokenChecker, modules);
@@ -41,20 +46,11 @@ app.use("/roles", tokenChecker, roles);
 app.use("/complaints", tokenChecker, complaints);
 app.use("/traffic", tokenChecker, traffic);
 app.use("/prizes", tokenChecker, prizes);
-/*
-! Ricorda logica per reindirizzare alla pagina di login
-! Tecnicamente da gestire da vue, credo
-var logged = false;
-app.get("/", (req, res) => {
-  if (logged) {
-    res.redirect("/main-page.html");
-    console.log("afa");
-  } else {
-    res.redirect("/login.html");
-  }
-});
 
-*/
+// Error handler
+app.use((err, req, res, next) => {
+	res.status(500).send({ success: false, message: "Something went wrong!" });
+});
 
 /**
  * ! Per servire API, almeno la prima parte

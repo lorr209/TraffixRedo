@@ -49,7 +49,13 @@ router.post("/", async (req, res) => {
 		self: "users/" + user._id,
 	};
 
-	return res.status(200).json(response);
+	return res
+		.status(200)
+		.cookie("token", token, {
+			httpOnly: true, // Blocca lettura tramite JS per maggiroe sicurezza
+			maxAge: options.expiresIn * 1000, // * 1000 per passaggio s -> ms
+		})
+		.json(response);
 });
 
 export default router;

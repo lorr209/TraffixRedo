@@ -1,24 +1,15 @@
 import jwt from "jsonwebtoken";
 
-/**
- * Per passare il token o mettiamo nell'header x-access-token, possibile farlo nella fetch con
- *  const response = await fetch("*api*", {
- *  method: "GET",
- *  headers: {
- *    "x-access-token": localStorage.getItem("userToken"), Se c'è
- *    "Content-Type": "application/json"
- *  }
- *  });
- *
- *  oppure come parametro di query ?token=TOKEN
- */
-
 const tokenChecker = function (req, res, next) {
 	// check header or url parameters or post parameters for token
-	var token = req.query.token || req.headers["x-access-token"];
+	var token =
+		req.query.token || req.headers["x-access-token"] || req.cookies?.token;
 
 	// if there is no token
 	if (!token) {
+		if (req.headers.accept && req.headers.accept.includes("text/html")) {
+			return res.redirect("/login.html");
+		}
 		return res.status(401).send({
 			success: false,
 			message: "No token provided.",
@@ -26,8 +17,11 @@ const tokenChecker = function (req, res, next) {
 	}
 
 	// decode token, verifies secret and checks exp
-	jwt.verify(token, process.env.SUPER_SECRET, function (err, decoded) {
+	jwt.verify(token, process.env.SUPER_SECRET, (err, decoded) => {
 		if (err) {
+			if (req.headers.accept && req.headers.accept.includes("text/html")) {
+				return res.redirect("/login.html");
+			}
 			return res.status(403).send({
 				success: false,
 				message: "Failed to authenticate token.",

@@ -1,4 +1,4 @@
-<script setup>
+<!--<script setup>
 	import HelloWorld from "./components/HelloWorld.vue";
 </script>
 
@@ -28,3 +28,15 @@
 		filter: drop-shadow(0 0 2em #42b883aa);
 	}
 </style>
+-->
+<script setup>
+	import { onBeforeMount } from "vue";
+	import HelloWorld from "../../components/HelloWorld.vue";
+</script>
+
+<template>
+	<div>
+		<h1>Welcome to the Main Application</h1>
+	</div>
+	<HelloWorld />
+</template>
