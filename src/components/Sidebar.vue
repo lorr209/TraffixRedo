@@ -10,7 +10,7 @@
 		},
 	});
 
-	const emit = defineEmits(["close-sidebar"]);
+	const emit = defineEmits(["close-sidebar", "change-view"]);
 </script>
 
 <template>
@@ -26,7 +26,14 @@
 
 		<nav class="sidebar-middle">
 			<ul>
-				<li v-for="module in modules" :key="module.self">{{ module.nome }}</li>
+				<li @click.prevent="emit('change-view', 'ModulesView')">Homepage</li>
+				<li
+					v-for="module in modules"
+					:key="module.self"
+					@click.prevent="emit('change-view', module.percorso)"
+				>
+					{{ module.nome }}
+				</li>
 			</ul>
 		</nav>
 
@@ -107,6 +114,7 @@
 		padding: 1.3rem;
 		margin-bottom: 0.8rem;
 		border-radius: 0.8rem;
+		cursor: pointer;
 	}
 
 	.sidebar-bottom {

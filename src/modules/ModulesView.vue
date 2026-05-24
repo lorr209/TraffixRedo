@@ -56,6 +56,7 @@
 		overflow-y: auto;
 		zoom: 1;
 		border-radius: 1rem;
+		cursor: pointer;
 	}
 
 	/* classi utili per dimensioni diverse */

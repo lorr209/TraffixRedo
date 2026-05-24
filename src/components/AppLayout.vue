@@ -43,6 +43,7 @@
 		:modules="userModules"
 		:isOpen="isSidebarOpen"
 		@close-sidebar="isSidebarOpen = false"
+		@change-view="(viewName) => $emit('change-view', viewName)"
 	/>
 	<slot :modules="userModules"></slot>
 </template>

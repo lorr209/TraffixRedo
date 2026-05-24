@@ -1,5 +1,5 @@
 <script setup>
-	import { ref, computed, onMounted } from "vue";
+	import { ref, computed, onBeforeMount } from "vue";
 
 	const prizes = ref([]);
 
@@ -12,14 +12,14 @@
 		termina: "",
 	});
 
-	onMounted(async () => {
+	onBeforeMount(async () => {
 		const response = await fetch("/api/prizes", {
 			method: "GET",
 			headers: { "Content-Type": "application/json" },
 		});
-		premi.value = response.json();
+		prizes.value = await response.json();
 	});
-	/*
+
 	const salvaPremio = async () => {
 		if (premioEdit.value.id) {
 			// API: PUT /api/premi/id
@@ -59,14 +59,11 @@
 	const chiudiModale = () => {
 		mostraModale.value = false;
 	};
-*/
-	console.log("senesi");
 </script>
 
 <template>
-	<div class="prizes-page">
-		<!--
-		<header class="prizes-header">
+	<main class="prizes-page">
+		<!--<header class="prizes-header">
 			<div>
 				<h1>🎁 Gestione Catalogo Premi</h1>
 				<p>Configura i premi riscattabili e la loro validità.</p>
@@ -74,7 +71,7 @@
 			<button @click="apriModale()" class="btn-primary">
 				+ Aggiungi Nuovo Premio
 			</button>
-		</header> -->
+		</header>-->
 
 		<div class="prizes-grid">
 			<div
@@ -95,22 +92,21 @@
 							<span class="label">Costo</span>
 							<span class="val">{{ p.costo }} pt</span>
 						</div>
-						<!-- 			<div class="stat">
+						<div class="stat">
 							<span class="label">Validità</span>
-							<span class="val">{{ p.durataGiorni }} gg</span>
-						</div> -->
+							<span class="val">{{ p.termina }} gg</span>
+						</div>
 					</div>
 				</div>
 
-				<!-- 	<div class="prize-actions">
+				<div class="prize-actions">
 					<button @click="apriModale(p)" class="btn-edit">Modifica</button>
 					<button @click="eliminaPremio(p.id)" class="btn-delete">
 						Elimina
 					</button>
-				</div> -->
+				</div>
 			</div>
 		</div>
-		<!-- 
 
 		<div v-if="mostraModale" class="modal-overlay">
 			<div class="modal-content">
@@ -148,10 +144,10 @@
 				<div class="modal-actions">
 					<button @click="chiudiModale" class="btn-cancel">Annulla</button>
 					<button @click="salvaPremio" class="btn-save">Salva Premio</button>
-				</div> -->
-		<!-- 			</div>
-		</div> -->
-	</div>
+				</div>
+			</div>
+		</div>
+	</main>
 </template>
 <style scoped>
 	.prizes-page {

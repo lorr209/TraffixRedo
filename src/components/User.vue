@@ -56,15 +56,11 @@
 
 		<div v-if="isOpen && user" class="user-popup">
 			<div class="popup-header">
-				<h4>{{ user.nome }} {{ user.cognome }}</h4>
+				<h3>{{ user.nome }} {{ user.cognome }}</h3>
 				<span class="email-text">{{ user.email }}</span>
 			</div>
 			<hr />
 			<div class="popup-body">
-				<p>
-					<strong>Account status:</strong>
-					{{ user.attivo ? "Attivo" : "Inattivo" }}
-				</p>
 				<p>
 					<strong>Ruolo:</strong>
 					<span class="mono-text">{{ ruolo }}</span>
@@ -85,6 +81,8 @@
 		border-radius: 0.8rem;
 		transition: background-color 0.2s;
 		user-select: none;
+		font-size: 2rem;
+		font-weight: bold;
 	}
 
 	#user:hover,
@@ -110,13 +108,11 @@
 		gap: 0.6rem;
 	}
 
-	.popup-header h4 {
+	.popup-header h3 {
 		margin: 0;
-		font-size: 1.1rem;
 	}
 
 	.email-text {
-		font-size: 0.85rem;
 		color: #6b7280;
 	}
 
@@ -128,12 +124,10 @@
 
 	.popup-body p {
 		margin: 0.4rem 0;
-		font-size: 0.9rem;
 	}
 
 	.mono-text {
 		font-family: monospace;
-		font-size: 0.8rem;
 		background: #f3f4f6;
 		padding: 0.2rem 0.4rem;
 		border-radius: 0.4rem;

@@ -1,0 +1,60 @@
+.dashboard-layout { display: flex; gap: 20px; padding: 20px; background: #f4f7f6; min-height: 100vh; }
+.kpi-container { flex: 1; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+
+/* Stile Card */
+.card {
+  background: white; border-radius: 12px; padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 5px solid #002d57;
+  display: flex; flex-direction: column; text-align: center;
+}
+.card-header { font-size: 0.75rem; font-weight: bold; color: #666; margin-bottom: 15px; }
+.value { font-size: 2.8rem; font-weight: 800; color: #002d57; display: block; }
+.label { font-size: 0.85rem; color: #888; }
+.footer-source { font-size: 0.7rem; color: #bbb; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
+.alert { border-top-color: #e74c3c; }
+
+/* Sidebar Controllo */
+.control-panel { 
+  width: 320px; background: white; border-radius: 12px; border: 1px solid #ddd;
+  padding: 20px; display: flex; flex-direction: column; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.scroll-area { flex: 1; overflow-y: auto; padding-right: 5px; }
+
+.tipo-item, .restanti-box { 
+  background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #eee;
+}
+.item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.input-name { border: none; border-bottom: 1px solid #ccc; background: transparent; font-weight: bold; width: 70%; }
+.item-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.item-inputs label { font-size: 0.65rem; color: #777; display: block; }
+.item-inputs input { width: 100%; padding: 4px; border: 1px solid #ddd; border-radius: 4px; }
+
+.btn-add { background: #002d57; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.btn-del { background: #ffeded; color: #e74c3c; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; }
+
+.progress-bar-container { 
+  height: 25px; background: #eee; border-radius: 12px; margin-top: 15px; 
+  position: relative; overflow: hidden; font-size: 0.75rem; line-height: 25px; text-align: center;
+}
+.progress-bar { height: 100%; background: #3498db; transition: width 0.3s; position: absolute; }
+.progress-text { position: relative; z-index: 2; font-weight: bold; }
+
+.analytics-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.controls-top { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+.selector button {
+  padding: 6px 15px; margin-left: 10px; border: 1px solid #002d57;
+  background: white; color: #002d57; border-radius: 4px; cursor: pointer;
+}
+.selector button.active { background: #002d57; color: white; }
+
+.visual-grid {
+  display: flex; align-items: flex-end; gap: 20px; height: 300px; 
+  padding-bottom: 40px; border-bottom: 2px solid #eee; overflow-x: auto;
+}
+.data-point { display: flex; flex-direction: column; align-items: center; min-width: 60px; position: relative; }
+.bar-traffico { width: 10px; background: #002d57; border-radius: 2px 2px 0 0; }
+.bar-inquinamento { width: 10px; background: #e74c3c; border-radius: 2px 2px 0 0; margin-top: 2px; }
+.timestamp { position: absolute; bottom: -30px; font-size: 0.7rem; transform: rotate(-45deg); white-space: nowrap; }

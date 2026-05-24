@@ -3,8 +3,6 @@
 		method: "GET",
 		headers: { "Content-Type": "application/json" },
 	});
-
-	console.log(response.json());
 </script>
 <template>
 	<p>aaaa</p>

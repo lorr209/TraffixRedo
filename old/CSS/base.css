@@ -1,0 +1,232 @@
+/* ========== GLOBAL VARIABLES =========== */
+@font-face {
+	font-family: "FredokaOne";
+	src: url("../Text/Fredoka_One/FredokaOne-Regular.ttf") format("truetype");
+}
+
+:root {
+	font-size: 10px;
+
+	--link-color-1: #9b61c2;
+	--link-color-2: #09aebf;
+
+	--dark-grey-100: #333333;
+	--dark-grey-300: #444444;
+
+	--dark-blue-100: #2a2a40;
+	--dark-blue-300: #24243e;
+	--dark-blue-500: #1e1e2f;
+
+	--lighter-blue-100: #0066cc;
+	--lighter-blue-300: #0052a3;
+
+	--lighter-blue-700: #35355e;
+
+	--orange-300: #ffaa0d;
+
+	--Traffix-color: -webkit-linear-gradient(
+		30deg,
+		rgba(0, 255, 255, 1) 0%,
+		rgba(155, 97, 194, 1) 65%,
+		rgba(255, 38, 38, 1) 100%
+	);
+	--Traffix-font: "FredokaOne";
+
+	--body-background: linear-gradient(teal, var(--dark-blue-100));
+
+	/* Animation timing tokens */
+	--anim-fast: 420ms;
+	--anim-medium: 700ms;
+	--anim-slow: 900ms;
+
+	/* Feature-specific durations */
+	--page-fade-duration: 800ms; /* splash/pages fade */
+	--splash-min-duration: 1500ms; /* minimum splash display */
+	--zoom-tween-duration: 120ms; /* button/key zoom tween */
+	--zoom-input-duration: 100ms; /* slider drag tween */
+}
+
+/* RESET BASE */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: sans-serif;
+}
+
+body {
+	display: flex;
+	font-size: 1.6rem;
+	flex-direction: column;
+	height: 100vh;
+	overflow: hidden;
+}
+
+a {
+	color: var(--link-color-2);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+/* ========== TITLE =========== */
+.traffix {
+	font-family: var(--Traffix-font), sans-serif;
+	letter-spacing: 0.5rem;
+	z-index: 1;
+	background: var(--Traffix-color);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	filter: drop-shadow(0.2rem 0.2rem var(--dark-grey-100));
+}
+
+/* ========== HEADER ========== */
+header {
+	position: fixed;
+	width: 100%;
+	height: 6rem;
+	background-color: var(--dark-blue-500);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 1.6rem;
+	z-index: 1000;
+}
+
+.header-left,
+.header-center,
+.header-right {
+	display: flex;
+	align-items: center;
+}
+
+#open-sidebar-button {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 2.4rem;
+	cursor: pointer;
+}
+
+.header-center {
+	flex: 1;
+	justify-content: center;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.header-center::-webkit-scrollbar {
+	display: none;
+}
+
+.header-modules {
+	background: var(--dark-blue-100);
+	padding: 0.8rem 1.6rem;
+	border-radius: 0.8rem;
+	margin: 0 0.8rem;
+	white-space: nowrap;
+}
+
+.header-right {
+	justify-content: flex-end;
+}
+
+/* ========== SIDEBAR ========== */
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: black;
+	opacity: 0;
+	z-index: 900;
+	transition: opacity 450ms;
+	pointer-events: none;
+}
+
+aside {
+	position: fixed;
+	top: 0;
+	left: -30rem;
+	width: 30rem;
+	height: 100%;
+	background: var(--dark-blue-500);
+	color: white;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	transition: left 0.3s ease;
+	z-index: 1001;
+
+	border-right: 0.2rem solid teal;
+}
+
+.sidebar.open {
+	left: 0;
+}
+
+.sidebar-top,
+.sidebar-middle,
+.sidebar-bottom {
+	padding: 1rem;
+	padding-top: 3rem;
+}
+
+.sidebar-top {
+	border-bottom: 0.1rem solid teal;
+	margin-top: 0.8rem;
+	padding-top: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+nav > ul {
+	overflow-y: auto;
+	flex-grow: 1;
+	scrollbar-width: none;
+}
+
+nav > ul li {
+	background: var(--dark-blue-100);
+	padding: 1.3rem;
+	margin-bottom: 0.8rem;
+	border-radius: 0.8rem;
+}
+
+.sidebar-bottom {
+	border-top: 0.1rem solid teal;
+	margin-bottom: 0.8rem;
+}
+
+.sidebar-bottom .user {
+	margin-bottom: 1.6rem;
+}
+
+#close-sidebar-button {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 2.4rem;
+	cursor: pointer;
+}
+
+.sidebar-top .traffix {
+	font-size: 2.4rem;
+}
+
+/* ========== MAIN BODY ========== */
+main {
+	flex: 1;
+	margin-top: 6rem;
+	background: var(--body-background);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	overflow: hidden;
+}

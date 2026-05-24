@@ -1,0 +1,38 @@
+/*
+da rifare perchè non funziona con le route
+
+
+.page-in {
+	-webkit-animation: fadeIn var(--anim-medium) ease-in;
+	animation: fadeIn var(--anim-medium) ease-in;
+}
+
+.page-out {
+	-webkit-transition: opacity var(--anim-medium);
+	transition: opacity var(--anim-medium);
+	opacity: 0;
+}
+
+@-webkit-keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* Optional default cross-fade timing 
+::view-transition-group(root) {
+	animation-duration: 500ms;
+}
+*/

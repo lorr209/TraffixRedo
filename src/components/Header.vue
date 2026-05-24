@@ -25,7 +25,7 @@
 	header {
 		position: sticky;
 		width: 100%;
-		height: 6rem;
+		height: 8rem;
 		background-color: var(--dark-blue-500);
 		color: white;
 		display: flex;

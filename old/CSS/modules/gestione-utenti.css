@@ -1,0 +1,178 @@
+table{
+    table-layout: fixed;
+}
+
+thead th{
+  position: sticky;
+}
+
+.table-wrapper {
+  max-height: 400px; /* Regola questa altezza per mostrare circa 10 righe */
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #ddd;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--darkblue);
+  border-radius: 40px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: var(--white);
+  border-radius: 40px;
+}
+
+.table-wrapper table {
+  margin: 50px 0 20px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.table-wrapper table th,
+.table-wrapper table td {
+  padding: 10px;
+  min-width: 75px;
+}
+
+.table-wrapper table th {
+  color: var(--white);
+  background: var(--darkblue);
+}
+
+.table-wrapper table tbody tr:nth-of-type(even) > * {
+  background: var(--lightblue);
+}
+
+.table-wrapper table td:first-child {
+  display: grid;
+  grid-template-columns: 25px 1fr;
+  grid-gap: 10px;
+  text-align: left;
+}
+
+/* --- Selezionata/Deselezionata --- */
+.selected td {
+  background-color: #e1f5fe !important;
+  border-top: 2px solid var(--darkblue);
+  border-bottom: 2px solid var(--darkblue);
+}
+
+/* --- Stato Attivo/Disattivo --- */
+.attivo, .disattivo {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.attivo {
+    background-color: #2ecc71;
+    box-shadow: 0 0 5px #2ecc71;
+}
+
+.disattivo {
+    background-color: #e74c3c;
+    box-shadow: 0 0 5px #e74c3c;
+}
+
+/* --- Gestione Hover --- */
+
+/* Solo le celle del corpo e l'header attivo cambiano colore */
+td:hover,
+thead th.on-hover {
+    color: var(--accent-color, #3498db); /* Aggiunto fallback colore */
+    background-color: var(--bg-color, #f0f8ff);
+    border: 1px solid var(--accent-color, #3498db);
+}
+
+/* Effetto ingrandimento SOLO per l'header */
+thead th.on-hover {
+    transform: scale(1.1); /* Ridotto leggermente per non rompere il layout table-fixed */
+    transition: transform 0.1s ease;
+    z-index: 10; /* Per farlo apparire sopra le altre celle */
+    position: relative;
+}
+
+.table-wrapper table td:first-child {
+    display: grid;
+    grid-template-columns: 25px 1fr;
+    grid-gap: 10px;
+    text-align: left;
+    /* Assicurati che non ci siano trasformazioni qui */
+    transform: none !important; 
+}
+
+.dashboard-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  height: 100vh;
+}
+
+.table-section {
+  flex: 1; /* Prende lo spazio rimanente */
+}
+
+/* bar a lato */
+.bar {
+  width: 300px;
+  background: #f9f9f9;
+  border-left: 1px solid #ddd;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+}
+
+.bar.open {
+  background: #ffffff;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Pulsanti stile */
+.actions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-primary { background: #3498db; color: white; margin-bottom: 10px; }
+.btn-save { background: #2ecc71; color: white; margin-top: 10px; }
+.btn-warn { background: #e67e22; color: white; }
+.btn-info { background: #95a5a6; color: white; }
+.btn-close { background: transparent; color: #888; margin-top: 20px; width: 100%; }
+
+/* Riutilizziamo i tuoi stili per tabella e pallini... */
+.pallino { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+.attivo { background: #2ecc71; }
+.disattivo { background: #e74c3c; }
