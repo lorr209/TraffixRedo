@@ -60,6 +60,7 @@
 		mostraModale.value = false;
 	};
 */
+	console.log("senesi");
 </script>
 
 <template>
