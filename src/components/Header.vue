@@ -1,5 +1,14 @@
 <script setup>
+	import User from "./User.vue";
+
 	const emit = defineEmits(["toggle-sidebar"]);
+
+	defineProps({
+		user: {
+			type: Object,
+			default: null,
+		},
+	});
 </script>
 
 <template>
@@ -8,7 +17,7 @@
 
 		<h1 class="traffix">TRAFFIX</h1>
 
-		<div id="user">👤 User</div>
+		<User :user="user" />
 	</header>
 </template>
 

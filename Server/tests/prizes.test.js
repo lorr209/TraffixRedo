@@ -115,7 +115,7 @@ beforeAll(() => {
 
 			const { _id, ...rest } = prize[0];
 
-			result = { self: "/prizes/" + id, ...rest, ...query };
+			result = { self: "/api/prizes/" + id, ...rest, ...query };
 
 			return result;
 		});
@@ -149,11 +149,11 @@ var token = jwt.sign(
 	},
 );
 
-describe("GET /prizes", () => {
+describe("GET /api/prizes", () => {
 	// * Testa 401
-	test("GET /prizes without providing a token should return 401", async () => {
+	test("GET /api/prizes without providing a token should return 401", async () => {
 		return request(app)
-			.get("/prizes")
+			.get("/api/prizes")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
@@ -161,9 +161,9 @@ describe("GET /prizes", () => {
 	});
 
 	// * Testa 403
-	test("GET /prizes with invalid token should return 403", async () => {
+	test("GET /api/prizes with invalid token should return 403", async () => {
 		return request(app)
-			.get("/prizes")
+			.get("/api/prizes")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -173,16 +173,16 @@ describe("GET /prizes", () => {
 	});
 
 	// * Testa 200
-	test("GET /prizes with token should return 200 and the results", async () => {
+	test("GET /api/prizes with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/prizes")
+			.get("/api/prizes")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
 					expect(res.body[0]).toEqual({
-						self: "/prizes/000000000000000000000000",
+						self: "/api/prizes/000000000000000000000000",
 						attivo: false,
 						nome: "Premio 1",
 						descrizione: "Premio uno",
@@ -194,10 +194,10 @@ describe("GET /prizes", () => {
 			});
 	});
 
-	// * Testa 400 (/prizes/:id)
-	test("GET /prizes/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/prizes/:id)
+	test("GET /api/prizes/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.get("/prizes/InvalidID")
+			.get("/api/prizes/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -206,10 +206,10 @@ describe("GET /prizes", () => {
 			});
 	});
 
-	// * Testa 404 (/prizes/:id)
-	test("GET /prizes/:id with token but without a prize associated to the id should return 404", async () => {
+	// * Testa 404 (/api/prizes/:id)
+	test("GET /api/prizes/:id with token but without a prize associated to the id should return 404", async () => {
 		return request(app)
-			.get("/prizes/999999999999999999999999")
+			.get("/api/prizes/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(404)
@@ -218,17 +218,17 @@ describe("GET /prizes", () => {
 			});
 	});
 
-	// * Testa 200 (/prizes/:id)
-	test("GET /prizes/:id with token and an id of a prize in the system should return 200 and the results", async () => {
+	// * Testa 200 (/api/prizes/:id)
+	test("GET /api/prizes/:id with token and an id of a prize in the system should return 200 and the results", async () => {
 		return request(app)
-			.get("/prizes/000000000000000000000000")
+			.get("/api/prizes/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body) {
 					expect(res.body).toEqual({
-						self: "/prizes/000000000000000000000000",
+						self: "/api/prizes/000000000000000000000000",
 						attivo: false,
 						nome: "Premio 1",
 						descrizione: "Premio uno",
@@ -241,21 +241,21 @@ describe("GET /prizes", () => {
 	});
 });
 
-describe("POST /prizes", () => {
-	// * Testa 401 (/prizes)
-	test("POST /prizes without providing a token should return 401", async () => {
+describe("POST /api/prizes", () => {
+	// * Testa 401 (/api/prizes)
+	test("POST /api/prizes without providing a token should return 401", async () => {
 		return request(app)
-			.post("/prizes")
+			.post("/api/prizes")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/prizes)
-	test("POST /prizes with invalid token should return 403", async () => {
+	// * Testa 403 (/api/prizes)
+	test("POST /api/prizes with invalid token should return 403", async () => {
 		return request(app)
-			.post("/prizes")
+			.post("/api/prizes")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -264,10 +264,10 @@ describe("POST /prizes", () => {
 			});
 	});
 
-	// * Testa 400 (/prizes)
-	test("POST /prizes with token but with a request with wrong arguments should return 400", async () => {
+	// * Testa 400 (/api/prizes)
+	test("POST /api/prizes with token but with a request with wrong arguments should return 400", async () => {
 		return request(app)
-			.post("/prizes")
+			.post("/api/prizes")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({})
@@ -277,10 +277,10 @@ describe("POST /prizes", () => {
 			});
 	});
 
-	// * Testa 400 (/prizes)
-	test("POST /prizes with token but with a request regarding an already existing prize should return 400", async () => {
+	// * Testa 400 (/api/prizes)
+	test("POST /api/prizes with token but with a request regarding an already existing prize should return 400", async () => {
 		return request(app)
-			.post("/prizes")
+			.post("/api/prizes")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -296,10 +296,10 @@ describe("POST /prizes", () => {
 			});
 	});
 
-	// * Testa 201 (/prizes)
-	test("POST /prizes with token should return 201 and the results", async () => {
+	// * Testa 201 (/api/prizes)
+	test("POST /api/prizes with token should return 201 and the results", async () => {
 		return request(app)
-			.post("/prizes")
+			.post("/api/prizes")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -312,7 +312,7 @@ describe("POST /prizes", () => {
 			.expect(201)
 			.then((res) => {
 				expect(res.body).toEqual({
-					self: "/prizes/333333333333333333333333",
+					self: "/api/prizes/333333333333333333333333",
 					attivo: false,
 					nome: "Premio 4",
 					descrizione: "Premio quattro",
@@ -325,21 +325,21 @@ describe("POST /prizes", () => {
 });
 
 // ? test per i patch
-describe("PATCH /prizes", () => {
-	// * Testa 401 (/prizes)
-	test("PATCH /prizes/:id without providing a token should return 401", async () => {
+describe("PATCH /api/prizes", () => {
+	// * Testa 401 (/api/prizes)
+	test("PATCH /api/prizes/:id without providing a token should return 401", async () => {
 		return request(app)
-			.patch("/prizes")
+			.patch("/api/prizes")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/prizes)
-	test("PATCH /prizes with invalid token should return 403", async () => {
+	// * Testa 403 (/api/prizes)
+	test("PATCH /api/prizes with invalid token should return 403", async () => {
 		return request(app)
-			.patch("/prizes/000000000000000000000000")
+			.patch("/api/prizes/000000000000000000000000")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -348,10 +348,10 @@ describe("PATCH /prizes", () => {
 			});
 	});
 
-	// * Testa 400 (/prizes/:id)
-	test("PATCH /prizes/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/prizes/:id)
+	test("PATCH /api/prizes/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.patch("/prizes/InvalidID")
+			.patch("/api/prizes/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -360,10 +360,10 @@ describe("PATCH /prizes", () => {
 			});
 	});
 
-	// * Testa 404 (/prizes)
-	test("PATCH /prizes/:id with token but with an id of an prize not existing should return 404", async () => {
+	// * Testa 404 (/api/prizes)
+	test("PATCH /api/prizes/:id with token but with an id of an prize not existing should return 404", async () => {
 		return request(app)
-			.patch("/prizes/999999999999999999999999")
+			.patch("/api/prizes/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.send({
@@ -375,9 +375,9 @@ describe("PATCH /prizes", () => {
 			});
 	});
 
-	test("PATCH /prizes with token should return 200 and the results", async () => {
+	test("PATCH /api/prizes with token should return 200 and the results", async () => {
 		return request(app)
-			.patch("/prizes/000000000000000000000000")
+			.patch("/api/prizes/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -387,7 +387,7 @@ describe("PATCH /prizes", () => {
 			.then((res) => {
 				if (res.body) {
 					expect(res.body.prize).toEqual({
-						self: "/prizes/000000000000000000000000",
+						self: "/api/prizes/000000000000000000000000",
 						attivo: true,
 						nome: "Premio 1",
 						descrizione: "Premio uno",

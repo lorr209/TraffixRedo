@@ -1,51 +1,24 @@
 <script setup>
-	import { onBeforeMount, ref } from "vue";
-	import HeaderMain from "../../components/HeaderMain.vue";
-	import SidebarMain from "../../components/SidebarMain.vue";
+	import { onBeforeMount, ref, computed } from "vue";
+	import AppLayout from "../../components/AppLayout.vue";
+	import ModulesView from "../../modules/ModulesView.vue";
+	import PrizesView from "../../modules/PrizesView.vue";
+	import MapView from "../.././modules/MapView.vue";
+	const current = ref("ModulesView");
 
-	const isSidebarOpen = ref(false);
-
-	const toggleSidebar = () => {
-		isSidebarOpen.value = !isSidebarOpen.value;
+	const changeView = (viewName) => {
+		current.value = viewName;
 	};
 </script>
 
 <template>
-	<HeaderMain @toggle-sidebar="toggleSidebar" />
-
-	<SidebarMain :isOpen="isSidebarOpen" @close-sidebar="isSidebarOpen = false" />
-
-	<main>
-		<div class="modules">
-			<div class="body-modules">Modulo 1</div>
-			<div class="body-modules w2 h2">Modulo 2</div>
-			<div class="body-modules h2">Modulo 3</div>
-			<div class="body-modules">Modulo 4</div>
-			<div class="body-modules w2 h3">Modulo 5</div>
-			<div class="body-modules h3">Modulo 6</div>
-		</div>
-	</main>
-
-	<footer class="view-options">
-		<div>
-			<span>Visualizzazione: </span>
-			<button id="grid-view-btn">Griglia</button>
-			<button id="list-view-btn">Lista</button>
-		</div>
-
-		<div class="zoom-controls">
-			<span>Zoom: </span>
-			<button id="zoom-out">−</button>
-			<input
-				type="range"
-				id="zoom-range"
-				min="0.5"
-				max="2"
-				step="0.1"
-				value="1"
-			/>
-			<button id="zoom-in">+</button>
-			<span id="zoom-value">100%</span>
-		</div>
-	</footer>
+	<AppLayout v-slot="{ modules }">
+		<ModulesView
+			v-if="current === 'ModulesView'"
+			:modules="modules"
+			@change-view="changeView"
+		/>
+		<PrizesView v-else-if="current === 'PrizesView'" />
+		<MapView v-else-if="current === 'MapView'" />
+	</AppLayout>
 </template>

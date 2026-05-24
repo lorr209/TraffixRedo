@@ -141,7 +141,7 @@ beforeAll(() => {
 
 			const { _id, ...rest } = user[0];
 
-			result = { self: "/users/" + id, ...rest, ...query };
+			result = { self: "/api/users/" + id, ...rest, ...query };
 
 			return result;
 		});
@@ -165,18 +165,18 @@ afterAll(async () => {
 });
 
 var token = jwt.sign(
-	{ email: "fakeuser1@mail.com" },
+	{ email: "fakeuser1@mail.com", id: "000000000000000000000000" },
 	process.env.SUPER_SECRET,
 	{
 		expiresIn: 300,
 	},
 );
 
-describe("GET /users", () => {
+describe("GET /api/users", () => {
 	// * Testa 401
-	test("GET /users without providing a token should return 401", async () => {
+	test("GET /api/users without providing a token should return 401", async () => {
 		return request(app)
-			.get("/users")
+			.get("/api/users")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
@@ -184,9 +184,9 @@ describe("GET /users", () => {
 	});
 
 	// * Testa 403
-	test("GET /users with invalid token should return 403", async () => {
+	test("GET /api/users with invalid token should return 403", async () => {
 		return request(app)
-			.get("/users")
+			.get("/api/users")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -196,16 +196,16 @@ describe("GET /users", () => {
 	});
 
 	// * Testa 200
-	test("GET /users with token should return 200 and the results", async () => {
+	test("GET /api/users with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/users")
+			.get("/api/users")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
 					expect(res.body[0]).toEqual({
-						self: "/users/000000000000000000000000",
+						self: "/api/users/000000000000000000000000",
 						attivo: true,
 						email: "fakeuser1@mail.com",
 						nome: "fake",
@@ -217,10 +217,45 @@ describe("GET /users", () => {
 			});
 	});
 
-	// * Testa 400 (/users/:id)
-	test("GET /users/:id with token but invalid id should return 400", async () => {
+	test("GET /api/users/me with invalid token signature should return 403", async () => {
 		return request(app)
-			.get("/users/InvalidID")
+			.get("/api/users/me")
+			.set("x-access-token", "InvalidTokenExample")
+			.set("Accept", "application/json")
+			.expect(403)
+			.then((res) => {
+				expect(res.body.success).toEqual(false);
+			});
+	});
+
+	test("GET /api/users/me with a valid token should return 200 and the logged user's data", async () => {
+		return request(app)
+			.get("/api/users/me")
+			.set("x-access-token", token)
+			.set("Accept", "application/json")
+			.expect(200)
+			.then((res) => {
+				expect(res.body).toEqual({
+					self: "/api/users/000000000000000000000000",
+					attivo: true,
+					email: "fakeuser1@mail.com",
+					nome: "fake",
+					cognome: "uno",
+					creato: "2000-00-00T00:00:00.000Z",
+					ruolo: "aaaaaaaaaaaaaaaaaaaaaaaa",
+					moduli: [
+						"a1a1a1a1a1a1a1a1a1a1a1a1",
+						"b2b2b2b2b2b2b2b2b2b2b2b2",
+						"c3c3c3c3c3c3c3c3c3c3c3c3",
+					],
+				});
+			});
+	});
+
+	// * Testa 400 (/api/users/:id)
+	test("GET /api/users/:id with token but invalid id should return 400", async () => {
+		return request(app)
+			.get("/api/users/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -229,10 +264,10 @@ describe("GET /users", () => {
 			});
 	});
 
-	// * Testa 404 (/users/:id)
-	test("GET /users/:id with token but without a user associated to the id should return 404", async () => {
+	// * Testa 404 (/api/users/:id)
+	test("GET /api/users/:id with token but without a user associated to the id should return 404", async () => {
 		return request(app)
-			.get("/users/999999999999999999999999")
+			.get("/api/users/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(404)
@@ -241,17 +276,17 @@ describe("GET /users", () => {
 			});
 	});
 
-	// * Testa 200 (/users/:id)
-	test("GET /users/:id with token and an id of a user in the system should return 200 and the results", async () => {
+	// * Testa 200 (/api/users/:id)
+	test("GET /api/users/:id with token and an id of a user in the system should return 200 and the results", async () => {
 		return request(app)
-			.get("/users/000000000000000000000000")
+			.get("/api/users/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body) {
 					expect(res.body).toEqual({
-						self: "/users/000000000000000000000000",
+						self: "/api/users/000000000000000000000000",
 						attivo: true,
 						email: "fakeuser1@mail.com",
 						nome: "fake",
@@ -263,10 +298,10 @@ describe("GET /users", () => {
 			});
 	});
 
-	// * Testa 400 (/users/:id/moduli)
-	test("GET /users/:id/moduli with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/users/:id/moduli)
+	test("GET /api/users/:id/moduli with token but invalid id should return 400", async () => {
 		return request(app)
-			.get("/users/InvalidID/moduli")
+			.get("/api/users/InvalidID/moduli")
 			.set("x-access-token", token)
 			.set("Content-type", "application/json")
 			.expect(400)
@@ -275,10 +310,10 @@ describe("GET /users", () => {
 			});
 	});
 
-	// * Testa 404 (/users/:id/moduli)
-	test("GET /users/:id/moduli with token but without a user associated to the id should return 404", async () => {
+	// * Testa 404 (/api/users/:id/moduli)
+	test("GET /api/users/:id/moduli with token but without a user associated to the id should return 404", async () => {
 		return request(app)
-			.get("/users/999999999999999999999999/moduli")
+			.get("/api/users/999999999999999999999999/moduli")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(404)
@@ -287,10 +322,10 @@ describe("GET /users", () => {
 			});
 	});
 
-	// * Testa 200 (/users/:id/moduli)
-	test("GET /users/:id/moduli with token and an id of a user in the system should return 200 and the results", async () => {
+	// * Testa 200 (/api/users/:id/moduli)
+	test("GET /api/users/:id/moduli with token and an id of a user in the system should return 200 and the results", async () => {
 		return request(app)
-			.get("/users/000000000000000000000000/moduli")
+			.get("/api/users/000000000000000000000000/moduli")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(200)
@@ -306,21 +341,21 @@ describe("GET /users", () => {
 	});
 });
 
-describe("POST /users", () => {
-	// * Testa 401 (/users)
-	test("POST /users without providing a token should return 401", async () => {
+describe("POST /api/users", () => {
+	// * Testa 401 (/api/users)
+	test("POST /api/users without providing a token should return 401", async () => {
 		return request(app)
-			.post("/users")
+			.post("/api/users")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/users)
-	test("POST /users with invalid token should return 403", async () => {
+	// * Testa 403 (/api/users)
+	test("POST /api/users with invalid token should return 403", async () => {
 		return request(app)
-			.post("/users")
+			.post("/api/users")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -329,10 +364,10 @@ describe("POST /users", () => {
 			});
 	});
 
-	// * Testa 400 (/users)
-	test("POST /users with token but with a request with wrong arguments should return 400", async () => {
+	// * Testa 400 (/api/users)
+	test("POST /api/users with token but with a request with wrong arguments should return 400", async () => {
 		return request(app)
-			.post("/users")
+			.post("/api/users")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({})
@@ -342,10 +377,10 @@ describe("POST /users", () => {
 			});
 	});
 
-	// * Testa 400 (/users)
-	test("POST /users with token but with a request regarding an already existing user should return 400", async () => {
+	// * Testa 400 (/api/users)
+	test("POST /api/users with token but with a request regarding an already existing user should return 400", async () => {
 		return request(app)
-			.post("/users")
+			.post("/api/users")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -361,10 +396,10 @@ describe("POST /users", () => {
 			});
 	});
 
-	// * Testa 201 (/users)
-	test("POST /users with token should return 201 and the results", async () => {
+	// * Testa 201 (/api/users)
+	test("POST /api/users with token should return 201 and the results", async () => {
 		return request(app)
-			.post("/users")
+			.post("/api/users")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -377,7 +412,7 @@ describe("POST /users", () => {
 			.expect(201)
 			.then((res) => {
 				expect(res.body).toEqual({
-					self: "/users/444444444444444444444444",
+					self: "/api/users/444444444444444444444444",
 					attivo: true,
 					email: "fakeuser4@mail.com",
 					nome: "fake",
@@ -390,21 +425,21 @@ describe("POST /users", () => {
 });
 
 // ? test per i patch
-describe("PATCH /users", () => {
-	// * Testa 401 (/users)
-	test("PATCH /users/:id without providing a token should return 401", async () => {
+describe("PATCH /api/users", () => {
+	// * Testa 401 (/api/users)
+	test("PATCH /api/users/:id without providing a token should return 401", async () => {
 		return request(app)
-			.patch("/users")
+			.patch("/api/users")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/users)
-	test("PATCH /users with invalid token should return 403", async () => {
+	// * Testa 403 (/api/users)
+	test("PATCH /api/users with invalid token should return 403", async () => {
 		return request(app)
-			.patch("/users/000000000000000000000000")
+			.patch("/api/users/000000000000000000000000")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -413,10 +448,10 @@ describe("PATCH /users", () => {
 			});
 	});
 
-	// * Testa 400 (/users/:id)
-	test("PATCH /users/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/users/:id)
+	test("PATCH /api/users/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.patch("/users/InvalidID")
+			.patch("/api/users/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -425,10 +460,10 @@ describe("PATCH /users", () => {
 			});
 	});
 
-	// * Testa 404 (/users)
-	test("PATCH /users/:id with token but with an id of an user not existing should return 404", async () => {
+	// * Testa 404 (/api/users)
+	test("PATCH /api/users/:id with token but with an id of an user not existing should return 404", async () => {
 		return request(app)
-			.patch("/users/999999999999999999999999")
+			.patch("/api/users/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.send({
@@ -440,9 +475,9 @@ describe("PATCH /users", () => {
 			});
 	});
 
-	test("PATCH /users with token should return 200 and the results", async () => {
+	test("PATCH /api/users with token should return 200 and the results", async () => {
 		return request(app)
-			.patch("/users/000000000000000000000000")
+			.patch("/api/users/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -452,7 +487,7 @@ describe("PATCH /users", () => {
 			.then((res) => {
 				if (res.body) {
 					expect(res.body.user).toEqual({
-						self: "/users/000000000000000000000000",
+						self: "/api/users/000000000000000000000000",
 						attivo: false,
 						email: "fakeuser1@mail.com",
 						nome: "fake",

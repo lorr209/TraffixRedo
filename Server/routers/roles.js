@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
 
 	roles = roles.map((role) => {
 		return {
-			self: "/roles/" + role._id,
+			self: "/api/roles/" + role._id,
 			nome: role.nome,
 			descrizione: role.descrizione,
 			moduli: role.moduli,
@@ -29,8 +29,8 @@ router.get("/:id", async (req, res) => {
 		return res.status(404).json({ success: false, message: "Role not found" });
 	}
 
-	response = {
-		self: "/roles/" + role._id,
+	const response = {
+		self: "/api/roles/" + role._id,
 		nome: role.nome,
 		descrizione: role.descrizione,
 		moduli: role.moduli,
@@ -69,19 +69,19 @@ router.post("/", async (req, res) => {
 	});
 
 	const createdRole = {
-		self: "/roles/" + role._id,
+		self: "/api/roles/" + role._id,
 		nome: role.nome,
 		descrizione: role.descrizione,
 		moduli: role.moduli,
 	};
 
 	res
-		.location("/roles/" + role._id)
+		.location("/api/roles/" + role._id)
 		.status(201)
 		.json(createdRole);
 });
 
-// * curl -X PATCH http://localhost:3000/roles/6a04eb8b8338a04e2783415d -H "Content-Type: application/json" -d "{\"nome\":\"TestConMappa\",\"descrizione\":\"Ruolo di test che può vedere una mappa\",\"moduli\":[\"6a04dc91dc20e82d65f68209\"]}"
+// * curl -X PATCH http://localhost:3000/api/roles/6a04eb8b8338a04e2783415d -H "Content-Type: application/json" -d "{\"nome\":\"TestConMappa\",\"descrizione\":\"Ruolo di test che può vedere una mappa\",\"moduli\":[\"6a04dc91dc20e82d65f68209\"]}"
 router.patch("/:id", async (req, res) => {
 	const { id } = req.params;
 

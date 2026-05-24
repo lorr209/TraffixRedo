@@ -59,11 +59,11 @@ afterAll(async () => {
 	userSpyFindOne.mockRestore();
 });
 
-describe("POST /auth", () => {
-	// * Testa 400 (/auth)
-	test("POST /auth with incorrect argumets should return 400", async () => {
+describe("POST /api/auth", () => {
+	// * Testa 400 (/api/auth)
+	test("POST /api/auth with incorrect argumets should return 400", async () => {
 		return request(app)
-			.post("/auth")
+			.post("/api/auth")
 			.set("Content-Type", "application/json")
 			.send({})
 			.expect(400)
@@ -72,10 +72,10 @@ describe("POST /auth", () => {
 			});
 	});
 
-	// * Testa 404 (/auth)
-	test("POST /auth providing a non existing mail should return 404", async () => {
+	// * Testa 404 (/api/auth)
+	test("POST /api/auth providing a non existing mail should return 404", async () => {
 		return request(app)
-			.post("/auth")
+			.post("/api/auth")
 			.set("Accept", "application/json")
 			.send({ email: "fakeuser4@mail.com", password: "password4" })
 			.expect(404)
@@ -84,10 +84,10 @@ describe("POST /auth", () => {
 			});
 	});
 
-	// * Testa 401 (/auth)
-	test("POST /auth without providing the correct password should return 401", async () => {
+	// * Testa 401 (/api/auth)
+	test("POST /api/auth without providing the correct password should return 401", async () => {
 		return request(app)
-			.post("/auth")
+			.post("/api/auth")
 			.set("Accept", "application/json")
 			.send({ email: "fakeuser1@mail.com", password: "WrongPassword" })
 			.expect(401)
@@ -96,10 +96,10 @@ describe("POST /auth", () => {
 			});
 	});
 
-	// * Testa 200 (/auth)
-	test("POST /auth with correct credentials should return 200", async () => {
+	// * Testa 200 (/api/auth)
+	test("POST /api/auth with correct credentials should return 200", async () => {
 		return request(app)
-			.post("/auth")
+			.post("/api/auth")
 			.set("Content-Type", "application/json")
 			.send({
 				email: "fakeuser1@mail.com",

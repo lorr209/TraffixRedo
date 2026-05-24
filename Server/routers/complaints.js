@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
 
 	complaints = complaints.map((complaint) => {
 		return {
-			self: "/complaints/" + complaint._id,
+			self: "/api/complaints/" + complaint._id,
 			lat: complaint.lat,
 			lon: complaint.lon,
 			tipo: complaint.tipo,
@@ -33,8 +33,8 @@ router.get("/:id", async (req, res) => {
 			.json({ success: false, message: "Complaint not found" });
 	}
 
-	response = {
-		self: "/complaints/" + complaint._id,
+	const response = {
+		self: "/api/complaints/" + complaint._id,
 		lat: complaint.lat,
 		lon: complaint.lon,
 		tipo: complaint.tipo,

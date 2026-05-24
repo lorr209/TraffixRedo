@@ -33,10 +33,9 @@ router.post("/", async (req, res) => {
 	var payload = {
 		email: user.email,
 		id: user._id,
-		//*other_data: encrypted_in_the_token,
 	};
 
-	var options = { expiresIn: 300 }; // expires in 5min
+	var options = { expiresIn: 1800 }; // expires in 30 min
 
 	var token = jwt.sign(payload, process.env.SUPER_SECRET, options);
 

@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 
 	users = users.map((user) => {
 		return {
-			self: "/users/" + user._id,
+			self: "/api/users/" + user._id,
 			attivo: user.attivo,
 			email: user.email,
 			nome: user.nome,
@@ -68,7 +68,7 @@ router.post("/", async (req, res) => {
 	});
 
 	const createdUser = {
-		self: "/users/" + user._id,
+		self: "/api/users/" + user._id,
 		attivo: user.attivo,
 		nome: user.nome,
 		cognome: user.cognome,
@@ -83,6 +83,39 @@ router.post("/", async (req, res) => {
 		.json(createdUser);
 });
 
+router.get("/me", async (req, res) => {
+	const id = req.loggedUser?.id;
+
+	if (!id) {
+		return res
+			.status(401)
+			.json({ success: false, message: "User identity not found in token" });
+	}
+
+	let user = await User.findById(id).catch((e) => {
+		return res.status(400).json({ success: false, message: "Invalid query" });
+	});
+
+	if (!user) {
+		return res.status(404).json({ success: false, message: "User not found" });
+	}
+
+	const { moduli } = await Role.findById(user.ruolo);
+
+	const response = {
+		self: "/api/users/" + user._id,
+		attivo: user.attivo,
+		email: user.email,
+		nome: user.nome,
+		cognome: user.cognome,
+		creato: user.creato,
+		ruolo: user.ruolo,
+		moduli: moduli,
+	};
+
+	res.status(200).json(response);
+});
+
 router.get("/:id", async (req, res) => {
 	const { id } = req.params;
 
@@ -95,7 +128,7 @@ router.get("/:id", async (req, res) => {
 	}
 
 	const response = {
-		self: "/users/" + user._id,
+		self: "/api/users/" + user._id,
 		attivo: user.attivo, // Da aggiungere su mongo
 		email: user.email,
 		nome: user.nome,

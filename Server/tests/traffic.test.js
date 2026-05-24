@@ -73,19 +73,19 @@ afterAll(async () => {
 	densitySpy.mockRestore();
 });
 
-describe("GET /traffic/densities", () => {
-	test("GET /traffic/densities without providing a token should return 401", async () => {
+describe("GET /api/traffic/densities", () => {
+	test("GET /api/traffic/densities without providing a token should return 401", async () => {
 		return request(app)
-			.get("/traffic/densities")
+			.get("/api/traffic/densities")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	test("GET /traffic/densities with invalid token should return 403", async () => {
+	test("GET /api/traffic/densities with invalid token should return 403", async () => {
 		return request(app)
-			.get("/traffic/densities")
+			.get("/api/traffic/densities")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Content-Type", "application/json")
 			.expect(403)
@@ -94,9 +94,9 @@ describe("GET /traffic/densities", () => {
 			});
 	});
 
-	test("GET /traffic/densities with token should return 200 and the results", async () => {
+	test("GET /api/traffic/densities with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/traffic/densities")
+			.get("/api/traffic/densities")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(200)
@@ -113,19 +113,19 @@ describe("GET /traffic/densities", () => {
 	});
 });
 
-describe("GET /traffic/vehicles", () => {
-	test("GET /traffic/vehicles without providing a token should return 401", async () => {
+describe("GET /api/traffic/vehicles", () => {
+	test("GET /api/traffic/vehicles without providing a token should return 401", async () => {
 		return request(app)
-			.get("/traffic/vehicles")
+			.get("/api/traffic/vehicles")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	test("GET /traffic/vehicles with invalid token should return 403", async () => {
+	test("GET /api/traffic/vehicles with invalid token should return 403", async () => {
 		return request(app)
-			.get("/traffic/vehicles")
+			.get("/api/traffic/vehicles")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Content-Type", "application/json")
 			.expect(403)
@@ -134,9 +134,9 @@ describe("GET /traffic/vehicles", () => {
 			});
 	});
 
-	test("GET /traffic/vehicles with token should return 200 and the results", async () => {
+	test("GET /api/traffic/vehicles with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/traffic/vehicles")
+			.get("/api/traffic/vehicles")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(200)

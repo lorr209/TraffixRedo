@@ -7,7 +7,7 @@ router.get("/", async (req, res) => {
 	let modules = await Module.find({});
 	modules = modules.map((module) => {
 		return {
-			self: "/modules/" + module._id,
+			self: "/api/modules/" + module._id,
 			attivo: module.attivo,
 			nome: module.nome,
 			descrizione: module.descrizione,
@@ -31,8 +31,8 @@ router.get("/:id", async (req, res) => {
 			.json({ success: false, message: "Module not found" });
 	}
 
-	response = {
-		self: "/modules/" + module._id,
+	const response = {
+		self: "/api/modules/" + module._id,
 		attivo: module.attivo,
 		nome: module.nome,
 		descrizione: module.descrizione,
@@ -42,7 +42,7 @@ router.get("/:id", async (req, res) => {
 	res.status(200).json(response);
 });
 
-//curl -X PATCH http://localhost:3000/modules/6a04dcc1dc20e82d65f6820a -H "Content-Type: application/json" -d "{\"attivo\":true}"
+//curl -X PATCH http://localhost:3000/api/modules/6a04dcc1dc20e82d65f6820a -H "Content-Type: application/json" -d "{\"attivo\":true}"
 router.patch("/:id", async (req, res) => {
 	const { id } = req.params;
 	const { attivo } = req.body;

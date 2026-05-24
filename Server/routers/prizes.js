@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
 
 	prizes = prizes.map((prize) => {
 		return {
-			self: "/prizes/" + prize._id,
+			self: "/api/prizes/" + prize._id,
 			attivo: prize.attivo,
 			nome: prize.nome,
 			descrizione: prize.descrizione,
@@ -32,8 +32,8 @@ router.get("/:id", async (req, res) => {
 		return res.status(404).json({ success: false, message: "Prize not found" });
 	}
 
-	response = {
-		self: "/prizes/" + prize._id,
+	const response = {
+		self: "/api/prizes/" + prize._id,
 		attivo: prize.attivo,
 		nome: prize.nome,
 		descrizione: prize.descrizione,
@@ -84,7 +84,7 @@ router.post("/", async (req, res) => {
 	});
 
 	const createdPrize = {
-		self: "/prizes/" + prize._id,
+		self: "/api/prizes/" + prize._id,
 		attivo: prize.attivo,
 		nome: prize.nome,
 		descrizione: prize.descrizione,
@@ -99,7 +99,7 @@ router.post("/", async (req, res) => {
 		.json(createdPrize);
 });
 
-// * curl -X PATCH http://localhost:3000/prizes/6a04fa08c134aaeb67d9908b -H "Content-Type: application/json" -d "{\"nome\":\"Test2\", \"termina\":\"2026-08-31T23:00:00.000+00:00\"}"
+// * curl -X PATCH http://localhost:3000/api/prizes/6a04fa08c134aaeb67d9908b -H "Content-Type: application/json" -d "{\"nome\":\"Test2\", \"termina\":\"2026-08-31T23:00:00.000+00:00\"}"
 router.patch("/:id", async (req, res) => {
 	const { id } = req.params;
 	// * NOTA: req.body deve avere i nomi dei parametri che matchano con quelli su mongoose

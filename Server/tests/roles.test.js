@@ -100,7 +100,7 @@ beforeAll(async () => {
 
 			const { _id, ...rest } = role[0];
 
-			result = { self: "/roles/" + id, ...rest, ...query };
+			result = { self: "/api/roles/" + id, ...rest, ...query };
 
 			return result;
 		});
@@ -121,11 +121,11 @@ var token = jwt.sign(
 	},
 );
 
-describe("GET /roles", () => {
+describe("GET /api/roles", () => {
 	// * Testa 401
-	test("GET /roles without providing a token should return 401", async () => {
+	test("GET /api/roles without providing a token should return 401", async () => {
 		return request(app)
-			.get("/roles")
+			.get("/api/roles")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
@@ -133,9 +133,9 @@ describe("GET /roles", () => {
 	});
 
 	// * Testa 403
-	test("GET /roles with invalid token should return 403", async () => {
+	test("GET /api/roles with invalid token should return 403", async () => {
 		return request(app)
-			.get("/roles")
+			.get("/api/roles")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -145,16 +145,16 @@ describe("GET /roles", () => {
 	});
 
 	// * Testa 200
-	test("GET /roles with token should return 200 and the results", async () => {
+	test("GET /api/roles with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/roles")
+			.get("/api/roles")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
 					expect(res.body[0]).toEqual({
-						self: "/roles/000000000000000000000000",
+						self: "/api/roles/000000000000000000000000",
 						nome: "Ruolo 1",
 						descrizione: "Ruolo uno",
 						moduli: [
@@ -167,10 +167,10 @@ describe("GET /roles", () => {
 			});
 	});
 
-	// * Testa 400 (/roles/:id)
-	test("GET /roles/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/roles/:id)
+	test("GET /api/roles/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.get("/roles/InvalidID")
+			.get("/api/roles/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -179,10 +179,10 @@ describe("GET /roles", () => {
 			});
 	});
 
-	// * Testa 404 (/roles/:id)
-	test("GET /roles/:id with token but without a role associated to the id should return 404", async () => {
+	// * Testa 404 (/api/roles/:id)
+	test("GET /api/roles/:id with token but without a role associated to the id should return 404", async () => {
 		return request(app)
-			.get("/roles/999999999999999999999999")
+			.get("/api/roles/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(404)
@@ -191,17 +191,17 @@ describe("GET /roles", () => {
 			});
 	});
 
-	// * Testa 200 (/roles/:id)
-	test("GET /roles/:id with token and an id of a role in the system should return 200 and the results", async () => {
+	// * Testa 200 (/api/roles/:id)
+	test("GET /api/roles/:id with token and an id of a role in the system should return 200 and the results", async () => {
 		return request(app)
-			.get("/roles/000000000000000000000000")
+			.get("/api/roles/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body) {
 					expect(res.body).toEqual({
-						self: "/roles/000000000000000000000000",
+						self: "/api/roles/000000000000000000000000",
 						nome: "Ruolo 1",
 						descrizione: "Ruolo uno",
 						moduli: [
@@ -215,21 +215,21 @@ describe("GET /roles", () => {
 	});
 });
 
-describe("POST /roles", () => {
-	// * Testa 401 (/roles)
-	test("POST /roles without providing a token should return 401", async () => {
+describe("POST /api/roles", () => {
+	// * Testa 401 (/api/roles)
+	test("POST /api/roles without providing a token should return 401", async () => {
 		return request(app)
-			.post("/roles")
+			.post("/api/roles")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/roles)
-	test("POST /roles with invalid token should return 403", async () => {
+	// * Testa 403 (/api/roles)
+	test("POST /api/roles with invalid token should return 403", async () => {
 		return request(app)
-			.post("/roles")
+			.post("/api/roles")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -238,10 +238,10 @@ describe("POST /roles", () => {
 			});
 	});
 
-	// * Testa 400 (/roles)
-	test("POST /roles with token but with a request with wrong arguments should return 400", async () => {
+	// * Testa 400 (/api/roles)
+	test("POST /api/roles with token but with a request with wrong arguments should return 400", async () => {
 		return request(app)
-			.post("/roles")
+			.post("/api/roles")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({})
@@ -251,10 +251,10 @@ describe("POST /roles", () => {
 			});
 	});
 
-	// * Testa 400 (/roles)
-	test("POST /roles with token but with a request regarding an already existing role should return 400", async () => {
+	// * Testa 400 (/api/roles)
+	test("POST /api/roles with token but with a request regarding an already existing role should return 400", async () => {
 		return request(app)
-			.post("/roles")
+			.post("/api/roles")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -268,10 +268,10 @@ describe("POST /roles", () => {
 			});
 	});
 
-	// * Testa 201 (/roles)
-	test("POST /roles with token should return 201 and the results", async () => {
+	// * Testa 201 (/api/roles)
+	test("POST /api/roles with token should return 201 and the results", async () => {
 		return request(app)
-			.post("/roles")
+			.post("/api/roles")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -282,7 +282,7 @@ describe("POST /roles", () => {
 			.expect(201)
 			.then((res) => {
 				expect(res.body).toEqual({
-					self: "/roles/333333333333333333333333",
+					self: "/api/roles/333333333333333333333333",
 					nome: "Ruolo 4",
 					descrizione: "Ruolo quattro",
 					moduli: ["dddddddddddddddddddddddd"],
@@ -292,21 +292,21 @@ describe("POST /roles", () => {
 });
 
 // ? test per i patch
-describe("PATCH /roles", () => {
-	// * Testa 401 (/roles)
-	test("PATCH /roles/:id without providing a token should return 401", async () => {
+describe("PATCH /api/roles", () => {
+	// * Testa 401 (/api/roles)
+	test("PATCH /api/roles/:id without providing a token should return 401", async () => {
 		return request(app)
-			.patch("/roles")
+			.patch("/api/roles")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/roles)
-	test("PATCH /roles with invalid token should return 403", async () => {
+	// * Testa 403 (/api/roles)
+	test("PATCH /api/roles with invalid token should return 403", async () => {
 		return request(app)
-			.patch("/roles/000000000000000000000000")
+			.patch("/api/roles/000000000000000000000000")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -315,10 +315,10 @@ describe("PATCH /roles", () => {
 			});
 	});
 
-	// * Testa 400 (/roles/:id)
-	test("PATCH /roles/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/roles/:id)
+	test("PATCH /api/roles/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.patch("/roles/InvalidID")
+			.patch("/api/roles/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -327,10 +327,10 @@ describe("PATCH /roles", () => {
 			});
 	});
 
-	// * Testa 404 (/roles)
-	test("PATCH /roles/:id with token but with an id of an role not existing should return 404", async () => {
+	// * Testa 404 (/api/roles)
+	test("PATCH /api/roles/:id with token but with an id of an role not existing should return 404", async () => {
 		return request(app)
-			.patch("/roles/999999999999999999999999")
+			.patch("/api/roles/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.send({
@@ -342,9 +342,9 @@ describe("PATCH /roles", () => {
 			});
 	});
 
-	test("PATCH /roles with token should return 200 and the results", async () => {
+	test("PATCH /api/roles with token should return 200 and the results", async () => {
 		return request(app)
-			.patch("/roles/000000000000000000000000")
+			.patch("/api/roles/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -354,7 +354,7 @@ describe("PATCH /roles", () => {
 			.then((res) => {
 				if (res.body) {
 					expect(res.body.role).toEqual({
-						self: "/roles/000000000000000000000000",
+						self: "/api/roles/000000000000000000000000",
 						attivo: false,
 						nome: "Ruolo 1",
 						descrizione: "Ruolo uno",

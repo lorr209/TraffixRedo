@@ -68,19 +68,19 @@ afterAll(async () => {
 	complaintSpyFindById.mockRestore();
 });
 
-describe("GET /complaints", () => {
-	test("GET /complaints without providing a token should return 401", async () => {
+describe("GET /api/complaints", () => {
+	test("GET /api/complaints without providing a token should return 401", async () => {
 		return request(app)
-			.get("/complaints")
+			.get("/api/complaints")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	test("GET /complaints with invalid token should return 403", async () => {
+	test("GET /api/complaints with invalid token should return 403", async () => {
 		return request(app)
-			.get("/complaints")
+			.get("/api/complaints")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Content-Type", "application/json")
 			.expect(403)
@@ -89,16 +89,16 @@ describe("GET /complaints", () => {
 			});
 	});
 
-	test("GET /complaints with token should return 200 and the results", async () => {
+	test("GET /api/complaints with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/complaints")
+			.get("/api/complaints")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
 					expect(res.body[0]).toEqual({
-						self: "/complaints/000000000000000000000000",
+						self: "/api/complaints/000000000000000000000000",
 						lat: 0,
 						lon: 0,
 						tipo: "tpl",
@@ -109,10 +109,10 @@ describe("GET /complaints", () => {
 			});
 	});
 
-	// * Testa 400 (/complaints/:id)
-	test("GET /complaints/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/complaints/:id)
+	test("GET /api/complaints/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.get("/complaints/InvalidID")
+			.get("/api/complaints/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -121,10 +121,10 @@ describe("GET /complaints", () => {
 			});
 	});
 
-	// * Testa 404 (/complaints/:id)
-	test("GET /complaints/:id with token but without a complaint associated to the id should return 404", async () => {
+	// * Testa 404 (/api/complaints/:id)
+	test("GET /api/complaints/:id with token but without a complaint associated to the id should return 404", async () => {
 		return request(app)
-			.get("/complaints/999999999999999999999999")
+			.get("/api/complaints/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(404)
@@ -133,16 +133,16 @@ describe("GET /complaints", () => {
 			});
 	});
 
-	// * Testa 200 (/complaints/:id)
-	test("GET /complaints/:id with token and an id of a complaint in the system should return 200 and the results", async () => {
+	// * Testa 200 (/api/complaints/:id)
+	test("GET /api/complaints/:id with token and an id of a complaint in the system should return 200 and the results", async () => {
 		return request(app)
-			.get("/complaints/000000000000000000000000")
+			.get("/api/complaints/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				expect(res.body).toEqual({
-					self: "/complaints/000000000000000000000000",
+					self: "/api/complaints/000000000000000000000000",
 					lat: 0,
 					lon: 0,
 					tipo: "tpl",

@@ -74,7 +74,7 @@ beforeAll(() => {
 
 			const { _id, ...rest } = module[0];
 
-			result = { self: "/modules/" + id, ...rest, ...query };
+			result = { self: "/api/modules/" + id, ...rest, ...query };
 
 			return result;
 		});
@@ -94,11 +94,11 @@ var token = jwt.sign(
 	},
 );
 
-describe("GET /modules", () => {
+describe("GET /api/modules", () => {
 	// * Testa 401
-	test("GET /modules without providing a token should return 401", async () => {
+	test("GET /api/modules without providing a token should return 401", async () => {
 		return request(app)
-			.get("/modules")
+			.get("/api/modules")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
@@ -106,9 +106,9 @@ describe("GET /modules", () => {
 	});
 
 	// * Testa 403
-	test("GET /modules with invalid token should return 403", async () => {
+	test("GET /api/modules with invalid token should return 403", async () => {
 		return request(app)
-			.get("/modules")
+			.get("/api/modules")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -118,16 +118,16 @@ describe("GET /modules", () => {
 	});
 
 	// * Testa 200
-	test("GET /modules with token should return 200 and the results", async () => {
+	test("GET /api/modules with token should return 200 and the results", async () => {
 		return request(app)
-			.get("/modules")
+			.get("/api/modules")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
 					expect(res.body[0]).toEqual({
-						self: "/modules/000000000000000000000000",
+						self: "/api/modules/000000000000000000000000",
 						attivo: true,
 						nome: "Modulo 1",
 						descrizione: "Modulo uno",
@@ -137,10 +137,10 @@ describe("GET /modules", () => {
 			});
 	});
 
-	// * Testa 400 (/modules/:id)
-	test("GET /modules/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/modules/:id)
+	test("GET /api/modules/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.get("/modules/InvalidID")
+			.get("/api/modules/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -149,10 +149,10 @@ describe("GET /modules", () => {
 			});
 	});
 
-	// * Testa 404 (/modules/:id)
-	test("GET /modules/:id with token but without a module associated to the id should return 404", async () => {
+	// * Testa 404 (/api/modules/:id)
+	test("GET /api/modules/:id with token but without a module associated to the id should return 404", async () => {
 		return request(app)
-			.get("/modules/999999999999999999999999")
+			.get("/api/modules/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(404)
@@ -161,17 +161,17 @@ describe("GET /modules", () => {
 			});
 	});
 
-	// * Testa 200 (/modules/:id)
-	test("GET /modules/:id with token and an id of a module in the system should return 200 and the results", async () => {
+	// * Testa 200 (/api/modules/:id)
+	test("GET /api/modules/:id with token and an id of a module in the system should return 200 and the results", async () => {
 		return request(app)
-			.get("/modules/000000000000000000000000")
+			.get("/api/modules/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.expect(200)
 			.then((res) => {
 				if (res.body) {
 					expect(res.body).toEqual({
-						self: "/modules/000000000000000000000000",
+						self: "/api/modules/000000000000000000000000",
 						attivo: true,
 						nome: "Modulo 1",
 						descrizione: "Modulo uno",
@@ -182,21 +182,21 @@ describe("GET /modules", () => {
 	});
 });
 
-describe("PATCH /modules", () => {
-	// * Testa 401 (/modules)
-	test("PATCH /modules/:id without providing a token should return 401", async () => {
+describe("PATCH /api/modules", () => {
+	// * Testa 401 (/api/modules)
+	test("PATCH /api/modules/:id without providing a token should return 401", async () => {
 		return request(app)
-			.patch("/modules")
+			.patch("/api/modules")
 			.expect(401)
 			.then((res) => {
 				expect(res.body.success).toEqual(false);
 			});
 	});
 
-	// * Testa 403 (/modules)
-	test("PATCH /modules with invalid token should return 403", async () => {
+	// * Testa 403 (/api/modules)
+	test("PATCH /api/modules with invalid token should return 403", async () => {
 		return request(app)
-			.patch("/modules/000000000000000000000000")
+			.patch("/api/modules/000000000000000000000000")
 			.set("x-access-token", "InvalidTokenExample")
 			.set("Accept", "application/json")
 			.expect(403)
@@ -205,10 +205,10 @@ describe("PATCH /modules", () => {
 			});
 	});
 
-	// * Testa 400 (/modules/:id)
-	test("PATCH /modules/:id with token but invalid id should return 400", async () => {
+	// * Testa 400 (/api/modules/:id)
+	test("PATCH /api/modules/:id with token but invalid id should return 400", async () => {
 		return request(app)
-			.patch("/modules/InvalidID")
+			.patch("/api/modules/InvalidID")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.expect(400)
@@ -217,10 +217,10 @@ describe("PATCH /modules", () => {
 			});
 	});
 
-	// * Testa 404 (/modules)
-	test("PATCH /modules/:id with token but with an id of an module not existing should return 404", async () => {
+	// * Testa 404 (/api/modules)
+	test("PATCH /api/modules/:id with token but with an id of an module not existing should return 404", async () => {
 		return request(app)
-			.patch("/modules/999999999999999999999999")
+			.patch("/api/modules/999999999999999999999999")
 			.set("x-access-token", token)
 			.set("Accept", "application/json")
 			.send({
@@ -232,9 +232,9 @@ describe("PATCH /modules", () => {
 			});
 	});
 
-	test("PATCH /modules with token should return 200 and the results", async () => {
+	test("PATCH /api/modules with token should return 200 and the results", async () => {
 		return request(app)
-			.patch("/modules/000000000000000000000000")
+			.patch("/api/modules/000000000000000000000000")
 			.set("x-access-token", token)
 			.set("Content-Type", "application/json")
 			.send({
@@ -244,7 +244,7 @@ describe("PATCH /modules", () => {
 			.then((res) => {
 				if (res.body) {
 					expect(res.body.module).toEqual({
-						self: "/modules/000000000000000000000000",
+						self: "/api/modules/000000000000000000000000",
 						attivo: false,
 						nome: "Modulo 1",
 						descrizione: "Modulo uno",

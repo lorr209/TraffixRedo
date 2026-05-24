@@ -4,6 +4,10 @@
 			type: Boolean,
 			default: false,
 		},
+		modules: {
+			type: Array,
+			default: [],
+		},
 	});
 
 	const emit = defineEmits(["close-sidebar"]);
@@ -22,12 +26,7 @@
 
 		<nav class="sidebar-middle">
 			<ul>
-				<li>Modulo 1</li>
-				<li>Modulo 2</li>
-				<li>Modulo 3</li>
-				<li>Modulo 4</li>
-				<li>Modulo 5</li>
-				<li>Modulo 6</li>
+				<li v-for="module in modules" :key="module.self">{{ module.nome }}</li>
 			</ul>
 		</nav>
 

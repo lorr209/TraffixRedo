@@ -32,23 +32,24 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Ruotes pubbliche
-app.use("/auth", auth);
+app.use("/api/auth", auth);
 app.use("/login.html", express.static(loginPage));
 app.use("/assets", express.static(assets));
 
 // Routes protette
 app.use("/", tokenChecker, express.static(frontend));
 
-app.use("/logs", tokenChecker, logs);
-app.use("/users", tokenChecker, users);
-app.use("/modules", tokenChecker, modules);
-app.use("/roles", tokenChecker, roles);
-app.use("/complaints", tokenChecker, complaints);
-app.use("/traffic", tokenChecker, traffic);
-app.use("/prizes", tokenChecker, prizes);
+app.use("/api/logs", tokenChecker, logs);
+app.use("/api/users", tokenChecker, users);
+app.use("/api/modules", tokenChecker, modules);
+app.use("/api/roles", tokenChecker, roles);
+app.use("/api/complaints", tokenChecker, complaints);
+app.use("/api/traffic", tokenChecker, traffic);
+app.use("/api/prizes", tokenChecker, prizes);
 
 // Error handler
 app.use((err, req, res, next) => {
+	console.log(err);
 	res.status(500).send({ success: false, message: "Something went wrong!" });
 });
 
