@@ -1,94 +1,201 @@
-<template>
-	<section class="main-layout">
-		<div class="table-container">
-			<div class="header-info">
-				<h2>Registro Attività (Log)</h2>
-				<p>
-					I record in questa pagina sono immutabili e servono per l'audit di
-					sistema.
-				</p>
-			</div>
+<script setup>
+import { ref, onBeforeMount } from "vue";
 
-			<div class="table-wrapper">
-				<table @mouseleave="activeColIndex = null">
-					<thead>
-						<tr>
-							<th :class="{ 'on-hover': activeColIndex === 0 }">
-								EMAIL UTENTE
-							</th>
-							<th :class="{ 'on-hover': activeColIndex === 1 }">ORARIO</th>
-							<th :class="{ 'on-hover': activeColIndex === 2 }">
-								AZIONE ESEGUITA
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="log in logs" :key="log.id" class="log-row">
-							<td @mouseover="handleMouseOver(0)" class="email-cell">
-								{{ log.email }}
-							</td>
-							<td @mouseover="handleMouseOver(1)" class="time-cell">
-								{{ log.orario }}
-							</td>
-							<td @mouseover="handleMouseOver(2)">
-								<span class="action-badge">{{ log.azione }}</span>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</section>
+// --- STATO DATI ---
+const logs = ref([]);
+const activeColIndex = ref(null);
+
+onBeforeMount(async () => {
+    try {
+        const response = await fetch("/api/logs", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        // DIAGNOSTICA TRAPPOLA 2: Controllo se il server sta mandando HTML (finto proxy) invece di JSON
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+            console.error("ERRORE CRITICO PROXY: L'API sta ritornando una pagina HTML invece del JSON dei log! Verifica il file vite.config.js");
+            return;
+        }
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Dati grezzi ricevuti dall'API logs:", data);
+
+            // DIAGNOSTICA TRAPPOLA 1: Gestione flessibile della struttura del JSON
+            if (Array.isArray(data)) {
+                // Se l'API è un array piatto (come complaints)
+                logs.value = data;
+            } else if (data && Array.isArray(data.logs)) {
+                // Se l'API risponde con { logs: [...] }
+                logs.value = data.logs;
+            } else if (data && Array.isArray(data.data)) {
+                // Se l'API risponde con { data: [...] }
+                logs.value = data.data;
+            } else {
+                console.error("Il backend ha risposto correttamente ma il formato non è un array riconosciuto:", data);
+            }
+        } else {
+            console.error("Il server ha risposto con un errore. Stato:", response.status);
+        }
+    } catch (error) {
+        console.error("Errore di rete o crash durante il parsing del JSON:", error);
+    }
+});
+
+// --- GESTIONE HOVER ---
+const handleMouseOver = (index) => {
+    activeColIndex.value = index;
+};
+
+// --- FORMATTAZIONE DATA (Sicura contro i valori nulli/indefiniti) ---
+const formattaData = (dataString) => {
+    if (!dataString) return "N/D";
+    const d = new Date(dataString);
+    // Se la data non è valida evita il crash e restituisce il testo grezzo
+    if (isNaN(d.getTime())) return dataString; 
+    return d.toLocaleDateString("it-IT") + " " + d.toLocaleTimeString("it-IT");
+};
+</script>
+
+<template>
+    <main class="logs-page">
+        <div class="panel table-container">
+            <div class="table-wrapper">
+                <table @mouseleave="activeColIndex = null" class="data-table">
+                    <thead>
+                        <tr>
+                            <th :class="{ 'on-hover-th': activeColIndex === 0 }">
+                                ID Utente
+                            </th>
+                            <th :class="{ 'on-hover-th': activeColIndex === 1 }">
+                                Data e Ora
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="logs.length === 0">
+                            <td colspan="2" style="text-align: center; color: #a0aec0; font-style: italic; padding: 20px;">
+                                Nessun log presente a database.
+                            </td>
+                        </tr>
+
+                        <tr v-else v-for="(log, index) in logs" :key="index" class="log-row">
+                            <td 
+                                @mouseover="handleMouseOver(0)" 
+                                class="user-cell truncate"
+                                :class="{ 'on-hover-td': activeColIndex === 0 }"
+                            >
+                                {{ log.utente }}
+                            </td>
+                            <td 
+                                @mouseover="handleMouseOver(1)" 
+                                class="time-cell"
+                                :class="{ 'on-hover-td': activeColIndex === 1 }"
+                            >
+                                {{ formattaData(log.data) }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 </template>
 
-<script setup>
-	import "@/assets/styles/CSS/base.css";
-	import "@/assets/styles/CSS/modules/visione-log.css";
+<style scoped>
+    /* Layout Principale basato sullo stile dell'applicazione */
+    .logs-page {
+        padding: 30px;
+        background: #f8f9fa;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
 
-	import { ref, onMounted } from "vue";
+    /* Contenitore Tabella (Stile Card Unificata) */
+    .panel {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
 
-	const logs = ref([]);
-	const activeColIndex = ref(null);
+    .table-wrapper {
+        max-height: 650px;
+        overflow-y: auto;
+        border-radius: 8px;
+    }
 
-	// 1. Caricamento Log via API (Mock incluso)
-	const caricaLogs = async () => {
-		try {
-			const response = await fetch("https://tuo-sito.it/api/logs");
-			const data = await response.json();
-			logs.value = data;
-		} catch (error) {
-			logs.value = [
-				{
-					id: 1,
-					email: "gian.carlo@gmail.com",
-					orario: "2023-10-27 10:30:15",
-					azione: "Accesso",
-				},
-				{
-					id: 2,
-					email: "gian.franco@gmail.com",
-					orario: "2023-10-27 11:45:22",
-					azione: "Modifica Ruolo",
-				},
-				{
-					id: 3,
-					email: "mario.rossi@gmail.com",
-					orario: "2023-10-27 12:10:05",
-					azione: "Logout",
-				},
-				{
-					id: 4,
-					email: "gian.carlo@gmail.com",
-					orario: "2023-10-27 14:20:44",
-					azione: "Visualizzazione Moduli",
-				},
-			];
-		}
-	};
+    /* Struttura Tabella */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
 
-	onMounted(caricaLogs);
+    /* Header Sticky */
+    .data-table th {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 16px;
+        text-align: left;
+        color: #718096;
+        font-weight: 600;
+        border-bottom: 2px solid #edf2f7;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 10;
+        transition: background-color 0.2s, color 0.2s;
+    }
 
-	const handleMouseOver = (index) => {
-		activeColIndex.value = index;
-	};
-</script>
+    .data-table td {
+        padding: 16px;
+        color: #2d3748;
+        border-bottom: 1px solid #edf2f7;
+        vertical-align: middle;
+        transition: background-color 0.15s;
+    }
+
+    /* Dettagli Celle */
+    .user-cell {
+        font-weight: 600;
+        color: #3182ce;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+
+    .time-cell {
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    /* Gestione troncatura per ID lunghi su schermi ridotti */
+    .truncate {
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Righe alternate morbide */
+    .log-row:nth-child(even) {
+        background-color: #fcfcfc;
+    }
+
+    .log-row:hover {
+        background-color: #f7fafc;
+    }
+
+    /* --- LOGICA DI HOVER SULLE COLONNE --- */
+    .on-hover-th {
+        background-color: #ebf8ff !important;
+        color: #2b6cb0 !important;
+    }
+
+    .on-hover-td {
+        background-color: #f0f4f8;
+    }
+</style>

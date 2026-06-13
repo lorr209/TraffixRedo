@@ -7,8 +7,8 @@
 	import ManageModulesView from "../../modules/ManageModulesView.vue";
 	/*import RolesView from "../../modules/RolesView.vue";
 	import UsersView from "../../modules/UsersView.vue";
-	import TrafficStatsView from "../../modules/TrafficStatsView.vue";
-	import LogsView from "../../modules/LogsView.vue";*/
+	import TrafficStatsView from "../../modules/TrafficStatsView.vue";*/
+	import LogsView from "../../modules/LogsView.vue";
 	import ComplaintsView from "../../modules/ComplaintsView.vue";
 
 	const current = ref("ModulesView");
@@ -37,7 +37,7 @@
 		<!--TODO: totale -->
 		<!-- <TrafficStatsView v-else-if="current === 'TrafficStatsView'" /> -->
 		<!--TODO: totale -->
-		<!-- <LogsView v-else-if="current === 'LogsView'" /> -->
+		<LogsView v-else-if="current === 'LogsView'" />
 		<!--TODO: totale -->
 		<!-- Whatever the hell is Visualizzazione traffico se c'è già la mappa-->
 		<ComplaintsView v-else-if="current === 'ComplaintsView'" />
