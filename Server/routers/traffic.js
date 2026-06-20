@@ -20,17 +20,18 @@ router.get("/densities", async (req, res) => {
 });
 
 router.get("/vehicles", async (req, res) => {
-	let vehicles = await Vehicle.find({});
+    let vehicles = await Vehicle.find({});
 
-	vehicles = vehicles.map((vehicle) => {
-		return {
-			data: vehicle.data,
-			lat: vehicle.lat,
-			lon: vehicle.lon,
-		};
-	});
+    vehicles = vehicles.map((vehicle) => {
+        return {
+            id_veicolo: vehicle.id_veicolo || "Veicolo_Generico", // <-- IMPORTANTE: per distinguere i tracciati
+            data: vehicle.data,
+            lat: vehicle.lat,
+            lon: vehicle.lon,
+        };
+    });
 
-	res.status(200).json(vehicles);
+    res.status(200).json(vehicles);
 });
 
 export default router;

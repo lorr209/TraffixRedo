@@ -8,6 +8,9 @@ export default mongoose.model(
 			data: {
 				type: Date,
 			},
+			id_veicolo: { 
+				type: String, 
+			},
 			lat: {
 				type: Number,
 			},
