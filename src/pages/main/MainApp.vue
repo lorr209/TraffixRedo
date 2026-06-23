@@ -32,14 +32,13 @@
 		<ManageModulesView v-else-if="current === 'ManageModulesView'" />
 		<!--TODO: totale -->
 		<RolesView v-else-if="current === 'RolesView'" />
-		<!--TODO: totale -->
+		
 		<UsersView v-else-if="current === 'UsersView'" />
 
 		<TrafficStatsView v-else-if="current === 'TrafficStatsView'" />
 		
 		<LogsView v-else-if="current === 'LogsView'" />
 		
-		<!-- Whatever the hell is Visualizzazione traffico se c'è già la mappa ::: era la mappa visualizzazione traffico-->
 		<ComplaintsView v-else-if="current === 'ComplaintsView'" />
 		
 	</AppLayout>
