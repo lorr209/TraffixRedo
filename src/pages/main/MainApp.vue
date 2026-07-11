@@ -26,11 +26,11 @@
 			@change-view="changeView"
 		/>
 		<PrizesView v-else-if="current === 'PrizesView'" />
-		<!--TODO: parte -->
+
 		<MapView v-else-if="current === 'MapView'" />
 		
 		<ManageModulesView v-else-if="current === 'ManageModulesView'" />
-		<!--TODO: totale -->
+
 		<RolesView v-else-if="current === 'RolesView'" />
 		
 		<UsersView v-else-if="current === 'UsersView'" />

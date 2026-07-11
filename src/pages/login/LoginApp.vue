@@ -177,7 +177,7 @@
 		border: none;
 		background: var(--dark-blue-100);
 		color: white;
-		font-size: 1.44rem;
+		font-size: 1.6rem;
 		transition: background 0.2s;
 	}
 
@@ -188,7 +188,7 @@
 
 	.login-box button {
 		width: 100%;
-		padding: 1.44rem;
+		padding: 1.6rem;
 		margin-block: 3rem;
 		background: linear-gradient(90deg, #09aebf, #9b61c2);
 		border: none;
