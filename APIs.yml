@@ -8,7 +8,7 @@ info:
 servers:
   - url: https://api.server.test/v1
     description: Localhost
-  - url: !!!METTI_QUI_L'URL_DI_ON_RENDER
+  - url: https://traffix-yjcq.onrender.com/
     description: render.com
 paths:
 
@@ -200,7 +200,7 @@ paths:
           description: id of the user
       requestBody:
         description: >-
-          The old password, required for security purpouses, and the new password must be passed in the body.
+          The old password, required for security purposes, and the new password must be passed in the body.
         required: true
         content:
           application/json:
