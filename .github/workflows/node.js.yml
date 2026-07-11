@@ -9,9 +9,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
-      DB_URL: ${{ secrets.DB_URL }}
+  env:
+    SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
+    DB_URL: ${{ secrets.DB_URL }}
+    FRONTEND: ${{ secrets.FRONTEND }}
 
     steps:
       - uses: actions/checkout@v4
