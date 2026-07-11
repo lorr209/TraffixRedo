@@ -3,16 +3,16 @@ name: Node.js CI/CD
 on:
   push:
     branches:
-      - main      # se il tuo branch principale è master, cambia in master
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-  env:
-    SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
-    DB_URL: ${{ secrets.DB_URL }}
-    FRONTEND: ${{ secrets.FRONTEND }}
+    env:
+      SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
+      DB_URL: ${{ secrets.DB_URL }}
+      FRONTEND: ${{ secrets.FRONTEND }}
 
     steps:
       - uses: actions/checkout@v4
