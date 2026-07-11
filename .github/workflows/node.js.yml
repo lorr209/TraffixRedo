@@ -3,7 +3,7 @@ name: Node.js CI/CD
 on:
   push:
     branches:
-      - main      # cambia in master se il tuo branch principale si chiama master
+      - main      # se il tuo branch principale è master, cambia in master
 
 jobs:
   test:
@@ -24,3 +24,16 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+
+  deploy:
+    name: Deploy to Render
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deploy
+        uses: sws2apps/render-deployment@main
+        with:
+          serviceId: ${{ secrets.RENDER_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+          multipleDeployment: false
