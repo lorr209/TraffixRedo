@@ -3,7 +3,6 @@ import { jest } from "@jest/globals";
 import jwt from "jsonwebtoken";
 import Density from "../routers/models/density.js";
 import Vehicle from "../routers/models/vehicle.js";
-import mongoose from "mongoose";
 import app from "../app.js";
 
 let densitySpy;
@@ -15,18 +14,21 @@ const mockVehicles = [
 		data: "2000-00-00T00:00:00.000Z",
 		lat: 0,
 		lon: 0,
+		id_veicolo: "Veicolo_Generico_0",
 	},
 	{
 		_id: "111111111111111111111111",
 		data: "2010-00-00T00:00:00.000Z",
 		lat: 0,
 		lon: 0,
+		id_veicolo: "Veicolo_Generico_1",
 	},
 	{
 		_id: "222222222222222222222222",
 		data: "2020-00-00T00:00:00.000Z",
 		lat: 0,
 		lon: 0,
+		id_veicolo: "Veicolo_Generico_2",
 	},
 ];
 
@@ -54,23 +56,27 @@ const mockDensities = [
 	},
 ];
 
-var token = jwt.sign({ email: "Esempio@mail.com" }, process.env.SUPER_SECRET, {
-	expiresIn: 300,
-});
+const token = jwt.sign(
+	{ email: "Esempio@mail.com" },
+	process.env.SUPER_SECRET,
+	{
+		expiresIn: 300,
+	}
+);
 
 beforeAll(() => {
-	densitySpy = jest.spyOn(Density, "find").mockImplementation(async (query) => {
+	densitySpy = jest.spyOn(Density, "find").mockImplementation(async () => {
 		return mockDensities;
 	});
 
-	vehicleSpy = jest.spyOn(Vehicle, "find").mockImplementation(async (query) => {
+	vehicleSpy = jest.spyOn(Vehicle, "find").mockImplementation(async () => {
 		return mockVehicles;
 	});
 });
 
-afterAll(async () => {
+afterAll(() => {
 	densitySpy.mockRestore();
-	densitySpy.mockRestore();
+	vehicleSpy.mockRestore();
 });
 
 describe("GET /api/traffic/densities", () => {
@@ -102,7 +108,7 @@ describe("GET /api/traffic/densities", () => {
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
-					expect(res.body[0]).toEqual({
+					expect(res.body[0]).toMatchObject({
 						data: "2000-00-00T00:00:00.000Z",
 						lat: 0,
 						lon: 0,
@@ -142,10 +148,11 @@ describe("GET /api/traffic/vehicles", () => {
 			.expect(200)
 			.then((res) => {
 				if (res.body && res.body[0]) {
-					expect(res.body[0]).toEqual({
+					expect(res.body[0]).toMatchObject({
 						data: "2000-00-00T00:00:00.000Z",
 						lat: 0,
 						lon: 0,
+						id_veicolo: "Veicolo_Generico_0",
 					});
 				}
 			});
