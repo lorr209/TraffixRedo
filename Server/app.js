@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 import "dotenv/config";
 
 import auth from "./routers/auth.js";
@@ -14,10 +15,12 @@ import complaints from "./routers/complaints.js";
 import traffic from "./routers/traffic.js";
 import prizes from "./routers/prizes.js";
 
-// ? Sarebbe un failsafe ma non avendo static (e non sapendo se implementarlo) non so se sia necessario
-const frontend = process.env.FRONTEND || "static";
-const loginPage = frontend + "/login.html";
-const assets = frontend + "/assets";
+// Percorsi assoluti
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const frontend = process.env.FRONTEND || "dist";
+const frontendPath = path.join(__dirname, "..", frontend);
 
 // Setup iniziale
 const app = express();
@@ -31,13 +34,19 @@ app.use(express.json());
 // Abilita cookies
 app.use(cookieParser());
 
-// Ruotes pubbliche
+// Routes pubbliche
 app.use("/api/auth", auth);
-app.use("/login.html", express.static(loginPage));
-app.use("/assets", express.static(assets));
+
+// Serve la pagina di login
+app.get("/login.html", (req, res) => {
+	res.sendFile(path.join(frontendPath, "login.html"));
+});
+
+// Serve gli asset del frontend
+app.use("/assets", express.static(path.join(frontendPath, "assets")));
 
 // Routes protette
-app.use("/", tokenChecker, express.static(frontend));
+app.use("/", tokenChecker, express.static(frontendPath));
 
 app.use("/api/logs", tokenChecker, logs);
 app.use("/api/users", tokenChecker, users);
@@ -50,17 +59,10 @@ app.use("/api/prizes", tokenChecker, prizes);
 // Error handler
 app.use((err, req, res, next) => {
 	console.log(err);
-	res.status(500).send({ success: false, message: "Something went wrong!" });
+	res.status(500).send({
+		success: false,
+		message: "Something went wrong!",
+	});
 });
-
-/**
- * ! Per servire API, almeno la prima parte
- * app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-    app.use((req,res,next) => {
-      console.log(req.method + ' ' + req.url)
-      next()
-    })
- */
 
 export default app;
