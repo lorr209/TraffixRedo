@@ -2,10 +2,12 @@ import request from "supertest";
 import { jest } from "@jest/globals";
 import jwt from "jsonwebtoken";
 import User from "../routers/models/user.js";
+import Log from "../routers/models/log.js"; // 1. Importa il modello Log
 import mongoose from "mongoose";
 import app from "../app.js";
 
 let userSpyFindOne;
+let logSpySave; // 2. Dichiara la variabile per lo spy del log
 
 const mockUsers = [
 	{
@@ -53,10 +55,18 @@ beforeAll(() => {
 			});
 			return result[0];
 		});
+
+	// 3. Simula (mock) il salvataggio del Log
+	logSpySave = jest
+		.spyOn(Log.prototype, "save")
+		.mockImplementation(async () => {
+			return Promise.resolve(true);
+		});
 });
 
 afterAll(async () => {
 	userSpyFindOne.mockRestore();
+	logSpySave.mockRestore(); // 4. Ripristina lo spy del log
 });
 
 describe("POST /api/auth", () => {
