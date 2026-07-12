@@ -25,7 +25,7 @@
 	header {
 		position: sticky;
 		width: 100%;
-		height: 8rem;
+		height: 7rem;
 		background-color: var(--dark-blue-500);
 		color: white;
 		display: flex;
@@ -33,6 +33,7 @@
 		align-items: center;
 		padding: 0 1.6rem;
 		z-index: 1000;
+		flex-shrink: 0;
 	}
 
 	.header-left,
