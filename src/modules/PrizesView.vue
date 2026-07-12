@@ -383,7 +383,7 @@
 	tbody td {
 		padding: 15px;
 		border-bottom: 1px solid #edf2f7;
-		font-size: 1rem;
+		font-size: 1.4rem;
 		color: #4a5568;
 		white-space: nowrap;
 		overflow: hidden;

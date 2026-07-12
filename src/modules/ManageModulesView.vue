@@ -260,7 +260,7 @@
 	}
 	.brand {
 		font-weight: 700;
-		font-size: 1.1rem;
+		font-size: 1.4rem;
 		color: #1a202c;
 		letter-spacing: 0.5px;
 	}
@@ -321,7 +321,7 @@
 		background: #3182ce;
 		color: white;
 		padding: 15px;
-		font-size: 0.8rem;
+		font-size: 1.6rem;
 		font-weight: 600;
 		z-index: 2;
 		letter-spacing: 0.5px;
@@ -341,7 +341,7 @@
 	tbody td {
 		padding: 15px;
 		border-bottom: 1px solid #edf2f7;
-		font-size: 0.85rem;
+		font-size: 1.4rem;
 		color: #4a5568;
 		white-space: nowrap;
 		overflow: hidden;
@@ -373,7 +373,7 @@
 		padding: 3px 6px;
 		border-radius: 4px;
 		font-family: monospace;
-		font-size: 0.8rem;
+		font-size: 1.4rem;
 		color: #4a5568;
 	}
 
@@ -400,7 +400,7 @@
 	.status-badge {
 		padding: 4px 10px;
 		border-radius: 12px;
-		font-size: 0.75rem;
+		font-size: 1.2rem;
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
@@ -448,7 +448,7 @@
 		flex-shrink: 0;
 	}
 	.sidebar-header h3 {
-		font-size: 1.1rem;
+		font-size: 1.4rem;
 		color: #1a202c;
 		font-weight: 700;
 		margin: 0;
@@ -456,7 +456,7 @@
 	.btn-close-x {
 		background: transparent;
 		border: none;
-		font-size: 1.1rem;
+		font-size: 1.6rem;
 		color: #a0aec0;
 		cursor: pointer;
 		transition: color 0.2s;
@@ -488,7 +488,7 @@
 		color: #744210;
 		padding: 12px;
 		border-radius: 8px;
-		font-size: 0.85rem;
+		font-size: 1.4rem;
 		margin-bottom: 20px;
 		line-height: 1.4;
 	}
@@ -498,7 +498,7 @@
 	}
 	.form-group label {
 		display: block;
-		font-size: 0.8rem;
+		font-size: 1.4rem;
 		font-weight: 600;
 		color: #4a5568;
 		margin-bottom: 6px;
@@ -511,7 +511,7 @@
 		padding: 10px;
 		border: 1px solid #cbd5e0;
 		border-radius: 8px;
-		font-size: 0.85rem;
+		font-size: 1.4rem;
 		color: #2d3748;
 		background: #f7fafc;
 		transition: all 0.2s;
@@ -527,7 +527,7 @@
 		border-color: #e2e8f0;
 	}
 	.hint {
-		font-size: 0.8rem;
+		font-size: 1.4rem;
 		color: #718096;
 		margin: -2px 0 10px 0;
 	}
@@ -575,7 +575,7 @@
 		content: "✓";
 		position: absolute;
 		color: white;
-		font-size: 0.75rem;
+		font-size: 1.4rem;
 		font-weight: bold;
 		top: 50%;
 		left: 50%;
@@ -588,7 +588,7 @@
 		gap: 1px;
 	}
 	.mod-name {
-		font-size: 0.85rem;
+		font-size: 1.4rem;
 		font-weight: 600;
 		color: #2d3748;
 	}
@@ -596,7 +596,7 @@
 		color: #276749;
 	}
 	.mod-desc {
-		font-size: 0.75rem;
+		font-size: 1.2rem;
 		color: #718096;
 		line-height: 1.2;
 	}
@@ -613,7 +613,7 @@
 		padding: 11px 15px;
 		border: none;
 		border-radius: 8px;
-		font-size: 0.85rem;
+		font-size: 1.4rem;
 		font-weight: 600;
 		cursor: pointer;
 		transition: all 0.2s;
@@ -646,7 +646,7 @@
 	.empty-state {
 		text-align: center;
 		color: #a0aec0;
-		font-size: 0.9rem;
+		font-size: 1.4rem;
 		margin-top: 60px;
 		font-style: italic;
 		padding: 0 20px;
