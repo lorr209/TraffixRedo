@@ -1,9 +1,8 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import User from "./models/user.js"; // Importa il modello di mongoose
-
-// * REQUEST EXAMPLE curl -X POST http://localhost:3000/auth  -H "Content-Type: application/json" -d "{\"email\":\"mario.rossi@example.com\",\"password\":\"PasswordSicura123!\"}
+import User from "./models/user.js"; 
+import Log from "./models/log.js";
 
 const router = express.Router();
 
@@ -29,6 +28,19 @@ router.post("/", async (req, res) => {
 			.status(401)
 			.json({ success: false, message: "Wrong credentials" });
 	}
+
+	// --- 2. SALVATAGGIO LOG ACCESSO ---
+	try {
+		const newLog = new Log({
+			data: new Date(), // Salva la data e l'ora attuali
+			utente: user._id   // Associa l'ID dell'utente appena validato
+		});
+		await newLog.save();
+	} catch (error) {
+		console.error("Errore durante il salvataggio del log di accesso:", error);
+		// Non blocchiamo l'esecuzione del login se il log fallisce
+	}
+	// ----------------------------------
 
 	var payload = {
 		email: user.email,
