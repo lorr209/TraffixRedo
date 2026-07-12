@@ -172,6 +172,7 @@
 	.modules {
 		display: grid;
 		gap: 1.2rem;
+		align-content: start;
 	}
 
 	.grid-view {
@@ -309,15 +310,15 @@
 		padding: 1rem;
 		flex-direction: row;
 		align-items: center;
-		gap: 1rem;
+		gap: 1.5rem;
 	}
 	.list-view .card-header {
 		margin: 0;
 		width: 250px;
+		flex-shrink: 0;
 	}
 	.list-view .card-body {
-		margin: 0;
-		flex: none;
+		display: none;
 	}
 	.list-view .card-footer {
 		border: none;
@@ -326,8 +327,13 @@
 		justify-content: space-between;
 		align-items: center;
 		flex: 1;
+		min-width: 0;
 	}
 	.list-view .module-desc {
-		white-space: normal;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		margin-right: 1rem;
+		flex: 1;
 	}
 </style>
