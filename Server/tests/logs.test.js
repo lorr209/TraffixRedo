@@ -23,7 +23,7 @@ const mockLogs = [
 	},
 ];
 
-const logsSpy;
+let logsSpy;
 var token = jwt.sign({ email: "Esempio@mail.com" }, process.env.SUPER_SECRET, {
 	expiresIn: 300,
 });
@@ -31,7 +31,7 @@ var token = jwt.sign({ email: "Esempio@mail.com" }, process.env.SUPER_SECRET, {
 beforeAll(() => {
 	logsSpy = jest.spyOn(Logs, "find").mockImplementation(async (query) => {
 		return mockLogs.filter((log) => {
-			if (!query || Object.keys(query).lenght === 0) {
+			if (!query || Object.keys(query).length === 0) {
 				return true;
 			} else {
 				return Object.keys(query).every((key) => log[key] === query[key]);

@@ -1,27 +1,277 @@
-openapi: '3.0.3'
+openapi: "3.0.3"
 info:
-  version: '1.0'
+  version: "1.0"
   title: "Traffix OpenAPI"
-  description: API for accessing to the Traffix ecosystem
-  license: 
+  description: API per accedere all'ecosistema Traffix.
+  license:
     name: MIT
 servers:
   - url: https://api.server.test/v1
     description: Localhost
   - url: https://traffix-yjcq.onrender.com/
     description: render.com
-paths:
 
-  # * API per l'autenticazione
-  # ? Tecnicamente funzionanete, mancante gestione codici e gestione parametri non funzionanti su ?id=
-  /auth:
+# Sicurezza globale applicata a tutte le rotte protette dal tokenChecker
+security:
+  - CookieAuth: []
+
+paths:
+  /api/auth:
     post:
-      summary: Authenticate a user
-      description: >-
-        Authenticates a user and returns a JWT 'token'.
+      summary: Autenticazione utente (Login)
+      description: Consente a un utente di accedere fornendo email e password. Restituisce un token JWT sia nel corpo della risposta che all'interno di un cookie HTTP-only.
+      security: [] # Questa rotta è pubblica (non richiede token)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
       responses:
-        '200':
-          description: 'Token created'
+        "200":
+          description: Login effettuato con successo.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: token=eyJhbGciOi...; Max-Age=1800; HttpOnly
+              description: Contiene il token JWT salvato in un cookie sicuro.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginSuccessResponse"
+        "400":
+          description: Richiesta non valida. Mancano email o password.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Arguments not found"
+        "401":
+          description: Credenziali errate.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Wrong credentials"
+        "404":
+          description: Utente non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "User not found"
+
+  /api/logs:
+    get:
+      summary: Recupera i log di acesso
+      description: Restituisce la lista di tutti i log di accesso registrati. È possibile filtrare per utente.
+      parameters:
+        - name: id
+          in: query
+          description: ID dell'utente specifico per filtrare i log.
+          required: false
+          schema:
+            type: string
+            example: "60c72b2f9b1d8a23c4d5e6f7"
+      responses:
+        "200":
+          description: Lista dei log recuperata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Log"
+        "400":
+          description: Query non valida (es. ID utente malformato).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Invalid query"
+
+  /api/users:
+    get:
+      summary: Recupera la lista degli utenti
+      description: Restituisce tutti gli utenti registrati nel sistema. È possibile filtrare per ruolo.
+      parameters:
+        - name: role
+          in: query
+          description: ID del ruolo per filtrare gli utenti.
+          required: false
+          schema:
+            type: string
+            example: "60c72b2f9b1d8a23c4d5e6f8"
+      responses:
+        "200":
+          description: Lista degli utenti recuperata con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Query non valida.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Invalid query"
+
+    post:
+      summary: Crea un nuovo utente
+      description: Registra un nuovo utente nel database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      responses:
+        "201":
+          description: Utente creato con successo.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: "/user/60c72b2f9b1d8a23c4d5e6f7"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Argomenti non validi o utente già esistente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                missingArgs:
+                  summary: Argomenti mancanti
+                  value:
+                    success: false
+                    message: "Invalid Arguments"
+                alreadyPresent:
+                  summary: Utente già presente
+                  value:
+                    success: false
+                    message: "User already present"
+        "500":
+          description: Errore interno del server durante il salvataggio.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Internal server error"
+
+  /api/users/me:
+    get:
+      summary: Ottieni informazioni sull'utente corrente
+      description: Recupera il profilo e l'elenco dei moduli abilitati per l'utente loggato estratto dal token.
+      responses:
+        "200":
+          description: Informazioni profilo dell'utente loggato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserMeResponse"
+        "400":
+          description: Query non valida.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Identità utente non trovata nel token.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "User identity not found in token"
+        "404":
+          description: Utente non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/users/{id}:
+    get:
+      summary: Ottieni un utente tramite ID
+      description: Restituisce le informazioni di un singolo utente cercato per ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "60c72b2f9b1d8a23c4d5e6f7"
+      responses:
+        "200":
+          description: Utente trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: ID o query non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Utente non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      summary: Aggiorna parzialmente un utente
+      description: Consente di modificare i campi desiderati di un utente. Il corpo della richiesta deve contenere i parametri del modello utente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "60c72b2f9b1d8a23c4d5e6f7"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                cognome:
+                  type: string
+                email:
+                  type: string
+                attivo:
+                  type: boolean
+                ruolo:
+                  type: string
+      responses:
+        "200":
+          description: Utente modificato con successo.
           content:
             application/json:
               schema:
@@ -29,639 +279,917 @@ paths:
                 properties:
                   success:
                     type: boolean
-                    description: 'True if the authentication was successful'
-                  token:
+                    example: true
+                  message:
                     type: string
-                    description: 'JWT token'
-        '401':
-          description: 'Unauthorized. Invalid credentials'
+                    example: "User updated successfully"
+                  user:
+                    type: object
+                    description: Il record utente completo dopo l'aggiornamento.
+        "400":
+          description: Errore o query non valida.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Utente non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/users/{id}/password:
+    patch:
+      summary: Aggiorna la password di un utente
+      description: Consente di aggiornare in modo sicuro la password crittografandola nel database.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "60c72b2f9b1d8a23c4d5e6f7"
       requestBody:
-        description: >-
-          The email and password must be passed in the body.
         required: true
         content:
           application/json:
             schema:
               type: object
               required:
-                - email
                 - password
               properties:
-                email:
-                  type: string
-                  description: 'Email address of the user'
                 password:
                   type: string
-                  description: 'Password of the user'
-            examples:
-              example1:
-                value:
-                  email: 'mario.rossi@unitn.it'
-                  password: 'password'
-    
-  # * API che restituisce tutti i log nel sistema 
-  #TODO Aggiungere eventuali filtri ?UserID=
-  # TODO: è una route protetta, indicarlo qui
-  # ? Tecnicamente funzionante, aggiungere gestione codici
-  /logs: 
+                  format: password
+                  example: "NuovaPasswordSicura456!"
+      responses:
+        "200":
+          description: Password aggiornata correttamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password updated successfully"
+        "400":
+          description: Query non valida o dati errati.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Utente non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/users/{id}/moduli:
     get:
-      summary: Return the logs
-      description: >-
-        Shows all the logs in the system.
-        Admin only.
+      summary: Ottieni i moduli abilitati per l'utente
+      description: Recupera l'elenco dei moduli associati al ruolo dell'utente specificato.
       parameters:
-        - in: query
-          name: user
+        - name: id
+          in: path
+          required: true
           schema:
             type: string
+          example: "60c72b2f9b1d8a23c4d5e6f7"
       responses:
-        '200': 
-          description: 'Logs list'
+        "200":
+          description: Elenco degli ID dei moduli abilitati.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LogEntry' #!! CORREGGERE
+                  type: string
+                  description: ID dell'oggetto Modulo
+                example:
+                  ["60c72b2f9b1d8a23c4d5e6fa", "60c72b2f9b1d8a23c4d5e6fb"]
+        "400":
+          description: ID o query non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Utente non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-  # * API per ottenere una lista degli utenti (GET) o per crearne uno nuovo (POST)
-  # ? Tecnicamente funzionante, controllare codici HTTP e gestione parametri non validi su ?role=
-  # ? aggiungere regex email
-  /users:
+  /api/complaints:
     get:
-      summary: returns the users
-      description: >-
-        Retrieve all users from the database.
-      parameters:                             # * Query opzionale ?role= per filtrare
-        - in: query
-          name: role
-          schema:
-            type: string
+      summary: Recupera tutte le lamentele
+      description: Restituisce l'elenco completo delle segnalazioni/lamentele registrate nel sistema.
       responses:
         "200":
-          description: "Collections of users"
-          content: 
+          description: Elenco delle lamentele recuperato con successo.
+          content:
             application/json:
               schema:
                 type: array
-                items: 
-                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
+                items:
+                  $ref: "#/components/schemas/ComplaintResponse"
 
-    post: 
-      summary: create a new user 
-      description: >-
-        Create a new user in the system
-      requestBody:
-        content:
-          application/json:
-            schema: 
-              $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-            examples:
-              example1:
-                value:
-                  email: "mario.rossi@unitn.it" #!!!! SOSTITUIRE CON UN ESEMPIO APPROPRIATO
-      responses:
-        "201":
-          description: "User created" #* nelle doc di open api specifica che c'è il link nel location header ????
-          headers:
-            "Location":
-              schema:
-                type: string
-              description: Link to the newly created user
-
-  # * API per ottenere i dettagli di un utente specifico (GET)
-  # * o per modificarne alcuni campi (PATCH)
-  # ? Tecnicamente funzionante, controllare codici HTTP e gestione parametri non validi su ?role=
-  # ? aggiungere regex email
-  /users/{userID}: 
-    get: 
-      description: >-
-        retrieve the user given a certain ID
-      summary: get an user
-      parameters:
-        - in: path
-          name: userID
-          required: true
-          schema:
-            type: string
-          description: id of the user
-      responses:
-        "200": 
-          description: "user found"
-          content: 
-            application/json: 
-              schema: 
-                $ref: "#/components/schemas/user" #! il riferimento è riferito rispetto alla parte sottostante di codice
-        "404":
-          description: "user not found"
-
-    patch: 
-      summary: Partially update a user
-      description: Update specific fields without affecting the rest of the document.
-      tags:
-        - Users #! Aggiungere tag
+  /api/complaints/{id}:
+    get:
+      summary: Ottieni una lamentela tramite ID
+      description: Recupera i dettagli di una singola segnalazione tramite il suo ID identificativo.
       parameters:
         - name: id
           in: path
           required: true
-          description: User ID
           schema:
             type: string
-      requestBody:
-        description: User fields to update
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdate'
+          example: "60c72b2f9b1d8a23c4d5e6fc"
       responses:
-        '200':
-          description: User updated successfully
+        "200":
+          description: Dettagli della lamentela recuperati con successo.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserUpdate'
-        '404':
-          description: User not found
+                $ref: "#/components/schemas/ComplaintResponse"
+        "400":
+          description: ID o query non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Invalid query"
+        "404":
+          description: Lamentela non trovata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Complaint not found"
 
-  # * API per modificare la password di un utente (PATCH) 
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /users/{userID}/password:
-    patch: 
-      description: >-
-        change an user password with a provided one
-      summary: change an user password
-      parameters: 
-        - in: path
-          name: userID
+  /api/modules:
+    get:
+      summary: Recupera tutti i moduli
+      description: Restituisce l'elenco completo dei moduli di sistema.
+      responses:
+        "200":
+          description: Elenco dei moduli recuperato con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModuleResponse"
+
+  /api/modules/{id}:
+    get:
+      summary: Ottieni un modulo tramite ID
+      description: Recupera le informazioni dettagliate di un singolo modulo di sistema.
+      parameters:
+        - name: id
+          in: path
           required: true
           schema:
             type: string
-          description: id of the user
+          example: "6a04dcc1dc20e82d65f6820a"
+      responses:
+        "200":
+          description: Modulo trovato con successo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuleResponse"
+        "400":
+          description: ID o query non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Invalid query"
+        "404":
+          description: Modulo non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Module not found"
+
+    patch:
+      summary: Aggiorna lo stato di attivazione di un modulo
+      description: Consente di attivare o disattivare un modulo specifico tramite il flag `attivo`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "6a04dcc1dc20e82d65f6820a"
       requestBody:
-        description: >-
-          The old password, required for security purposes, and the new password must be passed in the body.
         required: true
         content:
           application/json:
             schema:
               type: object
               required:
-                - oldPassword
-                - newPassword
+                - attivo
               properties:
-                oldPassword:
-                  type: string
-                  description: Old password of the user
-                newPassword:
-                  type: string
-                  description: New password of the user
-            examples:
-              example1:
-                value:
-                  email: '1234' 
-                  password: '4321'
-      responses:
-        '200':
-          description: Password updated successfully
-        '400':
-          description: Invalid input or password requirements not met
-        '401':
-          description: Old password incorrect
-        '404':
-          description: User not found
-
-  # * API per ottenere i moduli accessibili dall'utente, legati al ruolo (GET)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /users/{id}/moduli:                      #? rimandiamo all'user quale moduli richiedere ma poi facciamo comunque controlli?? e come li mandiamo 
-    get:
-      summary: Retrieve available modules
-      description: >-
-        Retriveve and display to the user the available modules
+                attivo:
+                  type: boolean
+                  description: Indica se il modulo deve essere attivo o disattivato.
+                  example: true
       responses:
         "200":
-          description: A JSON array of available modules
+          description: Modulo aggiornato con successo.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string       #* IDs
-
-  # * API per ottenere una lista delle lamentale (GET)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /complaints: 
-    get:
-      summary: returns the complaints
-      description: >-
-        Retrieve all complaints from the database.
-      parameters:                             # ? Query opzionale ?tipo= per filtrare
-        - in: query
-          name: type
-          schema:
-            type: string
-            enum: [TPL, traffico]             # ! Vedere i tag che usiamo
-      responses:
-        "200":
-          description: "Collections of complaints"
-          content: 
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Module updated successfully"
+                  module:
+                    $ref: "#/components/schemas/ModuleResponse"
+        "400":
+          description: Dati di input non validi o query fallita.
+          content:
             application/json:
               schema:
-                type: array
-                items: 
-                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-
-  # * Cerca tutti i moduli nel sistema (GET)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /modules: 
-    get:
-      summary: returns the modules
-      description: >-
-        Retrieve all modules available in the system.
-      parameters:                             # * Query opzionale per filtrare i moduli attivi
-        - in: query
-          name: active
-          schema:
-            type: boolean
-      responses:
-        "200":
-          description: "Collections of modules"
-          content: 
-            application/json:
-              schema:
-                type: array
-                items: 
-                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-  
-  # * Attiva o disattiva un modulo (PATCH)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /modules/{id}: 
-    patch: 
-      description: >-
-        Activate/Deactivate a module
-      summary: Activate/Deactivate a module
-      parameters:
-        - in: path
-          name: userID
-          required: true
-          schema:
-            type: string
-          description: id of the user
-      responses:
-        "200": 
-          description: "module found"
-          content: 
-            application/json: 
-              schema: 
-                $ref: "#/components/schemas/module" #! il riferimento è riferito rispetto alla parte sottostante di codice
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Invalid query"
         "404":
-          description: "module not found"
-
-  # * Elenca i ruoli disponibili (GET) o ne crea uno nuovo (POST)
-  # TODO: da fare documento
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /roles:
-    get:
-      summary: returns the users
-      description: >-
-        Retrieve all users from the database.    
-      responses:
-        "200":
-          description: "Collections of users"
-          content: 
-            application/json:
-              schema:
-                type: array
-                items: 
-                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-
-    post: 
-      summary: create a new user 
-      description: >-
-        Create a new user in the system
-      requestBody:
-        content:
-          application/json:
-            schema: 
-              $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-            examples:
-              example1:
-                value:
-                  email: "mario.rossi@unitn.it" #!!!! SOSTITUIRE CON UN ESEMPIO APPROPRIATO
-      responses:
-        "201":
-          description: "User created" #* nelle doc di open api specifica che c'è il link nel location header ????
-          headers:
-            "Location":
-              schema:
-                type: string
-              description: Link to the newly created user
-            
-  # * Modifica le informazioni relative ad un ruolo (PATCH)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /roles/{id}: 
-
-    patch: 
-      summary: Update a role
-      description: Update specific fields without affecting the rest of the document.
-      tags:
-        - Role #! Aggiungere tag
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: role ID
-          schema:
-            type: string
-      requestBody:
-        description: Role fields to update
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleUpdate' #! da creare
-      responses:
-        '200':
-          description: Role updated successfully
-          content:                  #? Che serva effettivamente, sia qui che altrove?
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleUpdate'
-        '404':
-          description: User not found
-  
-  # * Ottiene una lista dei premi (GET) o ne crea uno nuovo (POST)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /prizes: 
-    get:
-      summary: returns the prizes
-      description: >-
-        Retrieve all prizes from the database.
-      parameters:                             # ? Vogliamo filtrare qualcosa ?
-        - in: query
-          name: role
-          schema:
-            type: string
-            enum: [user, admin]
-      responses:
-        "200":
-          description: "Collections of prizes"
-          content: 
-            application/json:
-              schema:
-                type: array
-                items: 
-                $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-
-    post: 
-      summary: create a new user 
-      description: >-
-        Create a new user in the system
-      requestBody:
-        content:
-          application/json:
-            schema: 
-              $ref: '/component/schemas/Student' #!!!! SOSTITUIRE CON IL PATH DEL DB
-            examples:
-              example1:
-                value:
-                  email: "mario.rossi@unitn.it" #!!!! SOSTITUIRE CON UN ESEMPIO APPROPRIATO
-      responses:
-        "201":
-          description: "User created" #* nelle doc di open api specifica che c'è il link nel location header ????
-          headers:
-            "Location":
-              schema:
-                type: string
-              description: Link to the newly created user
-
-  # * Modifica informazioni relative ad un premio (PATCH)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /prizes/{id}: 
-    patch: 
-      summary: Partially update a Prize
-      description: Update specific fields without affecting the rest of the document.
-      tags:
-        - Prizes #! Aggiungere tag
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: Prize ID
-          schema:
-            type: string
-      requestBody:
-        description: Prize fields to update
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PrizeUpdate' # ? Che serva averne uno diverso?
-      responses:
-        '200':
-          description: Prize updated successfully
+          description: Modulo non trovato.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PrizeUpdate'
-        '404':
-          description: Prize not found
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Module not found"
 
-  # * Ottiene i dati relativi alla densità dei veicoli (GET)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /traffic/densities:
+  /api/roles:
     get:
-      summary: Retrieve individual car data
-      tags:
-        - Traffic
-      parameters:    # ! implementare come limite basso e limite alto
-        - name: timestamp
-          in: query
-          description: "Filter by hour (0-23)"
-          required: false
-          schema:
-            type: integer
-            minimum: 0
-            maximum: 23
+      summary: Recupera tutti i ruoli
+      description: Restituisce l'elenco completo di tutti i ruoli configurati nel sistema.
       responses:
-        '200':
-          description: A list of car observations
+        "200":
+          description: Elenco dei ruoli recuperato con successo.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CarObservation'
+                  $ref: "#/components/schemas/RoleResponse"
 
-  # * Ottiene i dati relativi alla densità dei veicoli (GET)
-  # ? Tecnicamente funzionante, controllare codici HTTP
-  /traffic/vehicles:
-    get:
-      summary: Retrieve car density statistics
-      tags:
-        - Traffic
-      parameters:   # ! implementare come limite basso e limite alto
-        - name: hour
-          in: query
-          description: "Filter by hour (0-23)"
-          required: false
-          schema:
-            type: integer
+    post:
+      summary: Crea un nuovo ruolo
+      description: Registra un nuovo ruolo definendo nome, descrizione e moduli associati.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nome
+                - descrizione
+                - moduli
+              properties:
+                nome:
+                  type: string
+                  example: "Test"
+                descrizione:
+                  type: string
+                  example: "Ruolo di test"
+                moduli:
+                  type: array
+                  items:
+                    type: string
+                  example: []
       responses:
-        '200':
-          description: Density data for the requested period
+        "201":
+          description: Ruolo creato con successo.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: "/api/roles/6a04eb8b8338a04e2783415d"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CarDensity' 
-  
-# !! a che servono i link nelle apI? boh
+                $ref: "#/components/schemas/RoleResponse"
+        "400":
+          description: Argomenti non validi o ruolo già presente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidArgs:
+                  summary: Argomenti non validi
+                  value:
+                    success: false
+                    message: "Invalid Arguments"
+                alreadyPresent:
+                  summary: Ruolo già esistente
+                  value:
+                    success: false
+                    message: "Role already present"
+        "500":
+          description: Errore interno del server durante il salvataggio.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-# !! parte di components e di schemas
+  /api/roles/{id}:
+    get:
+      summary: Ottieni un ruolo tramite ID
+      description: Recupera le informazioni di un singolo ruolo.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "6a04eb8b8338a04e2783415d"
+      responses:
+        "200":
+          description: Dettagli del ruolo recuperati correttamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleResponse"
+        "400":
+          description: ID o query non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Ruolo non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Role not found"
+
+    patch:
+      summary: Aggiorna parzialmente un ruolo
+      description: Consente di modificare i campi come `nome`, `descrizione` o l'array dei `moduli` associati.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "6a04eb8b8338a04e2783415d"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                  example: "TestConMappa"
+                descrizione:
+                  type: string
+                  example: "Ruolo di test che può vedere una mappa"
+                moduli:
+                  type: array
+                  items:
+                    type: string
+                  example: ["6a04dc91dc20e82d65f68209"]
+      responses:
+        "200":
+          description: Ruolo aggiornato correttamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Role updated successfully"
+                  role:
+                    type: object
+                    description: Record del ruolo aggiornato su DB.
+        "400":
+          description: Query o dati non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Ruolo non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/traffic/densities:
+    get:
+      summary: Recupera la densità del traffico
+      description: Restituisce l'elenco completo dei dati storici o attuali relativi alla densità dei flussi stradali.
+      responses:
+        "200":
+          description: Elenco delle densità recuperato con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DensityResponse"
+
+  /api/traffic/vehicles:
+    get:
+      summary: Recupera il tracciamento dei veicoli
+      description: Fornisce le coordinate geografiche e le marcature temporali dei singoli veicoli tracciati.
+      responses:
+        "200":
+          description: Lista dei veicoli recuperata correttamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VehicleResponse"
+
+  /api/prizes:
+    get:
+      summary: Recupera tutti i premi
+      description: Restituisce l'elenco completo dei premi presenti a catalogo.
+      responses:
+        "200":
+          description: Elenco dei premi recuperato con successo.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PrizeResponse"
+
+    post:
+      summary: Crea un nuovo premio
+      description: Registra un nuovo premio nel catalogo definendo nome, descrizione, costo e data di scadenza.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - attivo
+                - nome
+                - descrizione
+                - costo
+                - termina
+              properties:
+                attivo:
+                  type: boolean
+                  example: true
+                nome:
+                  type: string
+                  example: "Abbonamento Mensile TPL"
+                descrizione:
+                  type: string
+                  example: "Abbonamento mensile valido su tutta la rete urbana."
+                costo:
+                  type: number
+                  example: 250
+                termina:
+                  type: string
+                  format: date-time
+                  example: "2026-12-31T23:00:00.000Z"
+      responses:
+        "201":
+          description: Premio creato con successo.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: "/prize/6a04fa08c134aaeb67d9908b"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrizeResponse"
+        "400":
+          description: Argomenti non validi o premio già presente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidArgs:
+                  summary: Argomenti non validi
+                  value:
+                    success: false
+                    message: "Invalid Arguments"
+                alreadyPresent:
+                  summary: Premio già esistente
+                  value:
+                    success: false
+                    message: "Prize already present"
+        "500":
+          description: Errore interno del server durante il salvataggio.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/prizes/{id}:
+    get:
+      summary: Ottieni un premio tramite ID
+      description: Recupera le informazioni dettagliate di un singolo premio tramite ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "6a04fa08c134aaeb67d9908b"
+      responses:
+        "200":
+          description: Premio recuperato correttamente.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrizeResponse"
+        "400":
+          description: ID o query non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Premio non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                success: false
+                message: "Prize not found"
+
+    patch:
+      summary: Aggiorna parzialmente un premio
+      description: Consente di aggiornare singoli parametri del premio su DB (es. nome, costo, scadenza).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "6a04fa08c134aaeb67d9908b"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                attivo:
+                  type: boolean
+                nome:
+                  type: string
+                  example: "Nuovo Nome Premio"
+                descrizione:
+                  type: string
+                costo:
+                  type: number
+                termina:
+                  type: string
+                  format: date-time
+                  example: "2026-08-31T23:00:00.000Z"
+      responses:
+        "200":
+          description: Premio modificato correttamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Prize updated successfully"
+                  prize:
+                    type: object
+                    description: Il record del premio aggiornato.
+        "400":
+          description: Query o parametri non validi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Premio non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
-
   securitySchemes:
-    
-    #*-----------------------------------------------------------------
-    #* Che è sta roba??
-    # * Ok forse serve per i login (update di qualche ora dopo)
-     XAccessTokenHeaderAuth: # arbitrary name for the security scheme
-      description: >-
-        The API authentication.
-        The API key must be passed in the header 'x-access-token'.
-        The API key must be a valid JWT token.
+    CookieAuth:
       type: apiKey
-      in: header
-      name: x-access-token
-    
-    TokenQueryAuth: # arbitrary name for the security scheme
-      description: >-
-        The API authentication.
-        The API key must be passed in the query string 'token'.
-        The API key must be a valid JWT token.
-      type: apiKey
-      in: query
+      in: cookie
       name: token
+      description: Autenticazione basata su Cookie HTTP-Only contenente il token JWT.
 
-    #*-------------------------------------------------------
-
-  schemas: 
-    #*-----------------------------------------------------------------------
-    #*Schemi dei database
-    #* Lasciati esempi da easy lib
-
-    User:
+  schemas:
+    LoginRequest:
       type: object
       required:
-        - _id
-        - Attivo
-        - Cognome
-        - Data_Creazione
-        - Email
-        - Nome
-        - Punti
+        - email
+        - password
       properties:
-        _id:
+        email:
           type: string
-        Nome:
+          format: email
+          example: utente@esempio.it
+        password:
           type: string
-          example: "Mario"
-        Cognome:
-          type: string
-          example: "Rossi"
-        Email:
-          type: string
-          example: "mario.rossi@example.com"
-        Attivo:
+          format: password
+          example: PasswordSicura123
+
+    LoginSuccessResponse:
+      type: object
+      properties:
+        success:
           type: boolean
-          description: "Whether the user account is active"
-        Data_Creazione:
+          example: true
+        message:
+          type: string
+          example: "Enjoy your token!"
+        token:
+          type: string
+          description: Il token JWT generato.
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        email:
+          type: string
+          format: email
+          example: utente@esempio.it
+        id:
+          type: string
+          example: "60c72b2f9b1d8a23c4d5e6f7"
+        self:
+          type: string
+          example: "users/60c72b2f9b1d8a23c4d5e6f7"
+
+    Log:
+      type: object
+      properties:
+        data:
           type: string
           format: date-time
-          description: "timestamp of account creation"
-        Punti:
-          type: integer
-          minimum: 0
-          description: "Current point balance"
-
-    UserUpdate:
-      type: object
-      description: "Fields that can be modified, all of which are optional"
-      properties:
-        Attivo:
-          type: boolean
-          description: "Activate/Deactivate a user"
-        Role:
+          example: "2026-07-13T19:43:00.000Z"
+        utente:
           type: string
-          enum: [user, admin] #!Abbiamo più tipi in realtà
-          description: "Change the user's permission level"
+          description: ID dell'utente associato al log.
+          example: "60c72b2f9b1d8a23c4d5e6f7"
 
-    UserCreate: #! Da definire
-    Book:
+    UserCreateRequest:
       type: object
       required:
-        - title
-        - author
-        - ISBN
-        - status
+        - nome
+        - cognome
+        - email
+        - password
+        - ruolo
+      properties:
+        nome:
+          type: string
+          example: Mario
+        cognome:
+          type: string
+          example: Rossi
+        email:
+          type: string
+          format: email
+          example: mario.rossi@example.com
+        password:
+          type: string
+          format: password
+          example: PasswordSicura123!
+        ruolo:
+          type: string
+          description: ID del ruolo associato
+          example: "695b9d6f0d426d1902d2e8b2"
+
+    UserResponse:
+      type: object
       properties:
         self:
           type: string
-          description: 'Link to the book'
-        title:
+          example: "/api/users/60c72b2f9b1d8a23c4d5e6f7"
+        attivo:
+          type: boolean
+          example: true
+        email:
           type: string
-          description: 'Title of the book'
-        author:
+          format: email
+          example: mario.rossi@example.com
+        nome:
           type: string
-          description: 'Author of the book'
-        ISBN:
+          example: Mario
+        cognome:
           type: string
-          description: 'ISBN of the book'
-        status:
+          example: Rossi
+        creato:
           type: string
-          enum: [available, lended]
-          description: 'Tells whether the book is currently available or not'
-    
-    Booklending:
+          format: date-time
+          example: "2026-07-13T19:43:00.000Z"
+        ruolo:
+          type: string
+          description: ID del ruolo MongoDB
+          example: "695b9d6f0d426d1902d2e8b2"
+
+    UserMeResponse:
+      allOf:
+        - $ref: "#/components/schemas/UserResponse"
+        - type: object
+          properties:
+            moduli:
+              type: array
+              items:
+                type: string
+              description: Lista di ID dei moduli associati al ruolo dell'utente corrente.
+              example: ["60c72b2f9b1d8a23c4d5e6fa", "60c72b2f9b1d8a23c4d5e6fb"]
+
+    ComplaintResponse:
       type: object
-      required:
-      - student
-      - book
       properties:
         self:
           type: string
-          description: 'Link to the booklending'
-        student:
+          example: "/api/complaints/60c72b2f9b1d8a23c4d5e6fc"
+        lat:
+          type: number
+          format: float
+          description: Coordinata di latitudine geografica.
+          example: 45.4642
+        lon:
+          type: number
+          format: float
+          description: Coordinata di longitudine geografica.
+          example: 9.1900
+        tipo:
           type: string
-          description: 'Link to the student'
-        book:
-          type: string
-          description: 'Link to the book'
-        start_date:
+          enum: [traffico, tpl]
+          description: Categoria della lamentela/segnalazione.
+          example: "traffico"
+        data:
           type: string
           format: date-time
-          description: 'Start date of the booklending'
-          default: '${currentDate}'
-        end_date:
+          example: "2026-07-13T19:45:00.000Z"
+        testo:
           type: string
-          format: date-time
-          description: 'End date of the booklending'
-        status:
+          description: Testo descrittivo della segnalazione.
+          example: "Ingorgo stradale bloccato all'incrocio principale."
+
+    ModuleResponse:
+      type: object
+      properties:
+        self:
           type: string
-          enum: [active, expired]
-          description: 'Tells whether the booklending is currently active or not'
-        overdue:  
+          example: "/api/modules/6a04dcc1dc20e82d65f6820a"
+        attivo:
           type: boolean
-          description: >-
-            Tells whether the booklending is currently overdue or not.
-            The booklending is overdue if the end date is in the past and the status is 'active'.
-            The booklending is not overdue if the end date is in the future and the status is 'active'.
-            The booklending is not overdue if the status is 'expired'.
-        overdue_days:
-          type: integer
-          description: >-
-            Number of days the booklending is overdue.
-            The booklending is overdue if the end date is in the past and the status is 'active'.
-            The booklending is not overdue if the end date is in the future and the status is 'active'.
-            The booklending is not overdue if the status is 'expired'.
-            The number of days is calculated as the difference between the current date and the end date.
+          description: Indica lo stato di attivazione del modulo.
+          example: true
+        nome:
+          type: string
+          example: "Monitoraggio Traffico"
+        descrizione:
+          type: string
+          example: "Modulo dedicato all'analisi dei flussi di traffico urbano."
+        percorso:
+          type: string
+          description: Endpoint del frontend o rotta applicativa associata al modulo.
+          example: "/traffic-dashboard"
+
+    RoleResponse:
+      type: object
+      properties:
+        self:
+          type: string
+          example: "/api/roles/6a04eb8b8338a04e2783415d"
+        nome:
+          type: string
+          example: "Amministratore"
+        descrizione:
+          type: string
+          example: "Gestore completo del sistema"
+        moduli:
+          type: array
+          items:
+            type: string
+            description: ID dei moduli abilitati per questo ruolo
+          example: ["6a04dcc1dc20e82d65f6820a"]
+
+    DensityResponse:
+      type: object
+      properties:
+        data:
+          type: string
+          format: date-time
+          example: "2026-07-13T19:50:00.000Z"
+        lat:
+          type: number
+          format: float
+          example: 45.4642
+        lon:
+          type: number
+          format: float
+          example: 9.1900
+        quantità:
+          type: number
+          description: Valore quantitativo della densità rilevata
+          example: 45
+
+    VehicleResponse:
+      type: object
+      properties:
+        id_veicolo:
+          type: string
+          example: "Veicolo_Autobus_12"
+        data:
+          type: string
+          format: date-time
+          example: "2026-07-13T19:52:00.000Z"
+        lat:
+          type: number
+          format: float
+          example: 45.4680
+        lon:
+          type: number
+          format: float
+          example: 9.1820
+
+    PrizeResponse:
+      type: object
+      properties:
+        self:
+          type: string
+          example: "/api/prizes/6a04fa08c134aaeb67d9908b"
+        attivo:
+          type: boolean
+          description: Indica se il premio è attualmente riscuotibile.
+          example: true
+        nome:
+          type: string
+          example: "Abbonamento Mensile TPL"
+        descrizione:
+          type: string
+          example: "Abbonamento mensile valido su tutta la rete urbana."
+        costo:
+          type: number
+          description: Punti necessari per riscuotere il premio.
+          example: 250
+        creato:
+          type: string
+          format: date-time
+          example: "2026-07-13T21:55:00.000Z"
+        termina:
+          type: string
+          format: date-time
+          description: Data di fine validità del premio.
+          example: "2026-12-31T23:00:00.000Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Descrizione dell'errore"
