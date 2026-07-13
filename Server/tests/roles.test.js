@@ -100,7 +100,7 @@ beforeAll(async () => {
 
 			const { _id, ...rest } = role[0];
 
-			result = { self: "/api/roles/" + id, ...rest, ...query };
+			const result = { self: "/api/roles/" + id, ...rest, ...query };
 
 			return result;
 		});

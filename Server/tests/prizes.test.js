@@ -115,21 +115,9 @@ beforeAll(() => {
 
 			const { _id, ...rest } = prize[0];
 
-			result = { self: "/api/prizes/" + id, ...rest, ...query };
+			const result = { self: "/api/prizes/" + id, ...rest, ...query };
 
 			return result;
-		});
-
-	roleSpyFindById = jest
-		.spyOn(Role, "findById")
-		.mockImplementation(async (id) => {
-			if (!ObjectId.isValid(id)) {
-				throw new Error();
-			}
-			const result = mockRoles.filter((role) => {
-				return role._id === id ? true : false;
-			});
-			return result[0];
 		});
 });
 

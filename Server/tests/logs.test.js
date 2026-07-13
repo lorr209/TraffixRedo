@@ -23,6 +23,7 @@ const mockLogs = [
 	},
 ];
 
+const logsSpy;
 var token = jwt.sign({ email: "Esempio@mail.com" }, process.env.SUPER_SECRET, {
 	expiresIn: 300,
 });

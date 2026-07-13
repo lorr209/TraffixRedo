@@ -56,13 +56,4 @@ app.use("/api/complaints", tokenChecker, complaints);
 app.use("/api/traffic", tokenChecker, traffic);
 app.use("/api/prizes", tokenChecker, prizes);
 
-// Error handler
-app.use((err, req, res, next) => {
-	console.log(err);
-	res.status(500).send({
-		success: false,
-		message: "Something went wrong!",
-	});
-});
-
 export default app;

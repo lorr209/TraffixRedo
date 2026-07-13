@@ -74,7 +74,7 @@ beforeAll(() => {
 
 			const { _id, ...rest } = module[0];
 
-			result = { self: "/api/modules/" + id, ...rest, ...query };
+			const result = { self: "/api/modules/" + id, ...rest, ...query };
 
 			return result;
 		});

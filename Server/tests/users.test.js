@@ -141,7 +141,7 @@ beforeAll(() => {
 
 			const { _id, ...rest } = user[0];
 
-			result = { self: "/api/users/" + id, ...rest, ...query };
+			const result = { self: "/api/users/" + id, ...rest, ...query };
 
 			return result;
 		});
